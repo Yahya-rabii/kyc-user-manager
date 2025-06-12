@@ -1,9 +1,7 @@
 package com.sgma.authentication.client;
 
-import com.sgma.authentication.model.TokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,15 +9,6 @@ import java.util.Map;
 
 @FeignClient(name = "keycloak-client", url = "${keycloak.auth-server-url}")
 public interface KeycloakClient {
-
-    @PostMapping(value = "/realms/master/protocol/openid-connect/token",
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    TokenResponse getRefreshToken(
-            @RequestParam("grant_type") String grantType,
-            @RequestParam("client_id") String clientId,
-            @RequestParam("client_secret") String clientSecret,
-            @RequestParam("refresh_token") String refreshToken
-    );
 
     @GetMapping("/admin/realms")
     List<Map<String, Object>> listRealms(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken);
