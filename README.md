@@ -1,1 +1,1 @@
-![fposter,medium,wall_texture,product,750x1000](https://github.com/user-attachments/assets/1f354c35-f60f-441e-902c-781248095355)
+![fposter_medium_wall_texture_product_750x1000-removebg-preview](https://github.com/user-attachments/assets/4c515004-e02c-403b-a1f7-979acdc2d2ab)
