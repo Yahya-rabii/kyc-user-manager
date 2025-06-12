@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "286a850b-883c-4678-b14e-f7e23d9f81cf",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25091057"
+	},
+	"item": [
+		{
+			"name": "get realm api",
+			"protocolProfileBehavior": {
+				"strictSSL": true,
+				"followOriginalHttpMethod": true,
+				"followAuthorizationHeader": true,
+				"removeRefererHeaderOnRedirect": true,
+				"insecureHTTPParser": false,
+				"disableCookies": true,
+				"tlsPreferServerCiphers": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "http://localhost:8080/realms/master/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "admin-client",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "wtVUT7npnKO0VhG0rE4ZhAbQgTIcqgFk",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJYRDZrRDhzaXNOSVFFQnlTSDMwdktTNVNhbjRrTGlCMkMxcEZKdGRrcXNZIn0.eyJleHAiOjE3NDgzOTA2MDYsImlhdCI6MTc0ODM1NDYwNiwianRpIjoiMjdmODhlMjItMzJiZC00YWE1LWIwNTctNWJkZjY2ZjIyMDhkIiwiaXNzIjoiaHR0cHM6Ly9zc28tc2FuZGJveC5zZ21hcm9jLnJvb3QubmV0L2F1dGgvcmVhbG1zL3JlYWxtLWFwaSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyNDc5ZDkwMS1hMjA3LTRjNTgtYTcyNi1iMDAzMTBmNDEzNmQiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzYW5kYm94LWdsb2JhbCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJBUElfQ09NUExJQU5DRSIsIkFQSV9GRUFUVVJFX1RPR0dMRVNfUkVBREVSIiwiQVBJX0NPUkVfQ1JFRElUX0JVUkVBVV9BRE1JTiIsIkFQSV9DT1JFX0NSRURJVF9CVVJFQVUiLCJBUElfTlhQIiwiQVBJX0RPQ1VNRU5UIiwiQVBJX09GRkVSIiwiU09HRUtZQ19ST0xFIiwiQVBJX1JIIiwiQVBJX0NPUkUiLCJBUElfQ1VTVE9NRVIiLCJBUElfR0VPTE9DIiwiQVBJX0NPUkVfQ1JFQVRFX0xPQU4iLCJBUElfSU5TVEFOVF9UUkFOU0ZFUiIsIkFQSV9UUkFOU0ZFUl9ET1RBVElPTiIsIk1CSyIsIm9mZmxpbmVfYWNjZXNzIiwiQVBJX0NPUkVfQ1JFRElUX0lORk8iLCJBUElfTEFEUkFEIiwiQVBJX0NIQVRCT1QiLCJ1bWFfYXV0aG9yaXphdGlvbiIsIkFQSV9QUk9TUEVDVCIsImRlZmF1bHQtcm9sZXMtcmVhbG0tYXBpIiwiQVBJX0FDQ09VTlQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJzYW5kYm94LWdsb2JhbCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiZW50aXRlIjoidGVzdCIsImV4dGVuZGVkUmVhZENhbmFsIjoiY3JlZGl0LWJ1cmVhdS1iZmYiLCJjYW5hbFNvdXJjZSI6InNhbmRib3gtdGVzdCIsImNsaWVudEhvc3QiOiIxMC4xNzMuMTgxLjY5IiwiY2xpZW50SWQiOiJzYW5kYm94LWdsb2JhbCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNhbmRib3gtZ2xvYmFsIiwiY2xpZW50QWRkcmVzcyI6IjEwLjE3My4xODEuNjkiLCJlbWFpbCI6InNlcnZpY2UtYWNjb3VudC1zYW5kYm94LWdsb2JhbEBwbGFjZWhvbGRlci5vcmcifQ.AmOtZO2-LdfUmrZ7Nsndl0pSjpU124MyoO4VhiZNbUQMhi75tk39MOdo96HS2BJBMRQ_UKEGcAmH3qtpq8Oyt1w-GIbOW6kzBmkXcfDHDdDwlAkaV04-f9q0qVFKomvNuLb0lkuvrO3j6hiEwfpvKmcWpHJWm4aUFe0cLPjD8qhZg-1nfPPURJBcb47BnOFscIH3FRK45LXtWT8FsTgjFtK3WQh6SRhuBpPl3hOI3EPv2_8cOYyWmA10YbNtZV_Dz0LbMUV3F_3ZKWE0jh_c4aKjZ-HL812fkEtZjHBeDvNZI3c1RGxZi5PkXHdh0ZJG_W_ampYX9Wq4s9D5206c4Q"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/api/realms",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"realms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get users by realm api",
+			"protocolProfileBehavior": {
+				"strictSSL": true,
+				"followOriginalHttpMethod": true,
+				"followAuthorizationHeader": true,
+				"removeRefererHeaderOnRedirect": true,
+				"insecureHTTPParser": false,
+				"disableCookies": true,
+				"tlsPreferServerCiphers": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "wtVUT7npnKO0VhG0rE4ZhAbQgTIcqgFk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "admin-client",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://localhost:8080/realms/master/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJYRDZrRDhzaXNOSVFFQnlTSDMwdktTNVNhbjRrTGlCMkMxcEZKdGRrcXNZIn0.eyJleHAiOjE3NDgzOTA2MDYsImlhdCI6MTc0ODM1NDYwNiwianRpIjoiMjdmODhlMjItMzJiZC00YWE1LWIwNTctNWJkZjY2ZjIyMDhkIiwiaXNzIjoiaHR0cHM6Ly9zc28tc2FuZGJveC5zZ21hcm9jLnJvb3QubmV0L2F1dGgvcmVhbG1zL3JlYWxtLWFwaSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyNDc5ZDkwMS1hMjA3LTRjNTgtYTcyNi1iMDAzMTBmNDEzNmQiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzYW5kYm94LWdsb2JhbCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJBUElfQ09NUExJQU5DRSIsIkFQSV9GRUFUVVJFX1RPR0dMRVNfUkVBREVSIiwiQVBJX0NPUkVfQ1JFRElUX0JVUkVBVV9BRE1JTiIsIkFQSV9DT1JFX0NSRURJVF9CVVJFQVUiLCJBUElfTlhQIiwiQVBJX0RPQ1VNRU5UIiwiQVBJX09GRkVSIiwiU09HRUtZQ19ST0xFIiwiQVBJX1JIIiwiQVBJX0NPUkUiLCJBUElfQ1VTVE9NRVIiLCJBUElfR0VPTE9DIiwiQVBJX0NPUkVfQ1JFQVRFX0xPQU4iLCJBUElfSU5TVEFOVF9UUkFOU0ZFUiIsIkFQSV9UUkFOU0ZFUl9ET1RBVElPTiIsIk1CSyIsIm9mZmxpbmVfYWNjZXNzIiwiQVBJX0NPUkVfQ1JFRElUX0lORk8iLCJBUElfTEFEUkFEIiwiQVBJX0NIQVRCT1QiLCJ1bWFfYXV0aG9yaXphdGlvbiIsIkFQSV9QUk9TUEVDVCIsImRlZmF1bHQtcm9sZXMtcmVhbG0tYXBpIiwiQVBJX0FDQ09VTlQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJzYW5kYm94LWdsb2JhbCI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiZW50aXRlIjoidGVzdCIsImV4dGVuZGVkUmVhZENhbmFsIjoiY3JlZGl0LWJ1cmVhdS1iZmYiLCJjYW5hbFNvdXJjZSI6InNhbmRib3gtdGVzdCIsImNsaWVudEhvc3QiOiIxMC4xNzMuMTgxLjY5IiwiY2xpZW50SWQiOiJzYW5kYm94LWdsb2JhbCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNhbmRib3gtZ2xvYmFsIiwiY2xpZW50QWRkcmVzcyI6IjEwLjE3My4xODEuNjkiLCJlbWFpbCI6InNlcnZpY2UtYWNjb3VudC1zYW5kYm94LWdsb2JhbEBwbGFjZWhvbGRlci5vcmcifQ.AmOtZO2-LdfUmrZ7Nsndl0pSjpU124MyoO4VhiZNbUQMhi75tk39MOdo96HS2BJBMRQ_UKEGcAmH3qtpq8Oyt1w-GIbOW6kzBmkXcfDHDdDwlAkaV04-f9q0qVFKomvNuLb0lkuvrO3j6hiEwfpvKmcWpHJWm4aUFe0cLPjD8qhZg-1nfPPURJBcb47BnOFscIH3FRK45LXtWT8FsTgjFtK3WQh6SRhuBpPl3hOI3EPv2_8cOYyWmA10YbNtZV_Dz0LbMUV3F_3ZKWE0jh_c4aKjZ-HL812fkEtZjHBeDvNZI3c1RGxZi5PkXHdh0ZJG_W_ampYX9Wq4s9D5206c4Q"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/api/realms/master/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"realms",
+						"master",
+						"users"
+					],
+					"query": [
+						{
+							"key": "documentId",
+							"value": "123",
+							"disabled": true
+						},
+						{
+							"key": "baseName",
+							"value": "baseName123",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get realm kyc",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "wtVUT7npnKO0VhG0rE4ZhAbQgTIcqgFk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "admin-client",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://localhost:8080/realms/master/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "AppCC-Token",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/admin/realms",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"realms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login api",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"admin\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "refresh api",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"admin\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login kyc",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "admin-client",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "wtVUT7npnKO0VhG0rE4ZhAbQgTIcqgFk",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/realms/master/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
