@@ -29,7 +29,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody ClientLogin client) {
         try {
-            ResponseEntity<Map<String, Object>> responseEntity = authService.authenticateClient(client);
+            ResponseEntity<Map<String, Object>> responseEntity = authService.login(client);
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return ResponseEntity.status(HttpStatus.OK).body(responseEntity.getBody());
             }
@@ -51,7 +51,6 @@ public class AuthController {
         log.error("Token refresh failed: {}", responseEntity.getStatusCode());
         return ResponseEntity.status(responseEntity.getStatusCode()).body(null);
     }
-
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody Map<String, String> body,
@@ -78,7 +77,6 @@ public class AuthController {
         return pathSegments[2];
     }
 
-
     @GetMapping("/realms")
     public ResponseEntity<List<String>> realms(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replaceFirst("Bearer ", "");
@@ -102,8 +100,6 @@ public class AuthController {
         return ResponseEntity.ok(roles);
     }
 
-    //I want to create a method that will do this. My app basically will allow a user to modify the roles of other users. So, if this user click on a modified user he wants to modify and click on a button, he will get all the roles of the realm of this user and also he will get all the roles of clients which are in the same realm. The same as what we have in the Keycock interface. When you want to assign a role to a user, it gives you the possibility to assign roles of realm and assign roles of clients. I want to do the same thing in my application. So, modify this backend applications to ensure that I will have a method to fit the realms roles, the realm roles, and the client roles of the same realm.
-
     @GetMapping("/realms/{realm}/available-roles")
     public ResponseEntity<Map<String, Object>> getAllAvailableRoles(
             @RequestHeader("Authorization") String authHeader,
@@ -113,25 +109,23 @@ public class AuthController {
         return ResponseEntity.ok(roles);
     }
 
-
-
     @PostMapping("/realms/{realm}/users/{userId}/roles")
-    public ResponseEntity<Void> addRoles(@RequestHeader("Authorization") String authHeader,
-                                         @PathVariable String realm,
-                                         @PathVariable String userId,
-                                         @RequestBody List<Map<String, String>> roles) {
+    public ResponseEntity<Void> addRealmRolesToUser(@RequestHeader("Authorization") String authHeader,
+                                                    @PathVariable String realm,
+                                                    @PathVariable String userId,
+                                                    @RequestBody List<Map<String, String>> roles) {
         String token = authHeader.replaceFirst("Bearer ", "");
-        authService.addRolesToUser(realm, userId, roles, token);
+        authService.addRealmRolesToUser(realm, userId, roles, token);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/realms/{realm}/users/{userId}/roles")
-    public ResponseEntity<Void> removeRoles(@RequestHeader("Authorization") String authHeader,
-                                            @PathVariable String realm,
-                                            @PathVariable String userId,
-                                            @RequestBody List<Map<String, String>> roles) {
+    public ResponseEntity<Void> removeRealmRolesFromUser(@RequestHeader("Authorization") String authHeader,
+                                                         @PathVariable String realm,
+                                                         @PathVariable String userId,
+                                                         @RequestBody List<Map<String, String>> roles) {
         String token = authHeader.replaceFirst("Bearer ", "");
-        authService.removeRolesFromUser(realm, userId, roles, token);
+        authService.removeRealmRolesFromUser(realm, userId, roles, token);
         return ResponseEntity.ok().build();
     }
 

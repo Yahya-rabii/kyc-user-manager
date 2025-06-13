@@ -38,7 +38,13 @@ public class AuthService {
         MDC.clear();
     }
 
-    public ResponseEntity<Map<String, Object>> authenticateClient(ClientLogin client) {
+    /**
+     * Logs in a user to Keycloak using the provided credentials.
+     *
+     * @param client The client login details containing username, password, and grant type.
+     * @return A ResponseEntity containing the access token and other details.
+     */
+    public ResponseEntity<Map<String, Object>> login(ClientLogin client) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -52,8 +58,13 @@ public class AuthService {
         return restTemplate.exchange(tokenUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {});
     }
 
-
-    public  ResponseEntity<Map<String, Object>>  refresh(String refreshToken) {
+    /**
+     * Refreshes the access token using the provided refresh token.
+     *
+     * @param refreshToken The refresh token to use for obtaining a new access token.
+     * @return A ResponseEntity containing the new access token and other details.
+     */
+    public  ResponseEntity<Map<String, Object>> refresh(String refreshToken) {
         addTraceId();
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -71,8 +82,13 @@ public class AuthService {
         }
     }
 
-
-
+    /**
+     * Logs out a user from Keycloak.
+     *
+     * @param realm The name of the realm.
+     * @param userId The ID of the user.
+     * @param accessToken The access token for authentication.
+     */
     public void logout(String realm, String userId, String accessToken) {
         addTraceId();
         try {
@@ -82,6 +98,12 @@ public class AuthService {
         }
     }
 
+    /**
+     * Lists all realms available in Keycloak.
+     *
+     * @param accessToken The access token for authentication.
+     * @return A list of realm names.
+     */
     public List<String> listRealms(String accessToken) {
         addTraceId();
         try {
@@ -94,6 +116,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * Lists all users in a specific realm.
+     *
+     * @param realm The name of the realm.
+     * @param accessToken The access token for authentication.
+     * @return A list of users in the specified realm.
+     */
     public List<Map<String, Object>> listUsersInRealm(String realm, String accessToken) {
         addTraceId();
         try {
@@ -103,6 +132,14 @@ public class AuthService {
         }
     }
 
+    /**
+     * Retrieves the roles assigned to a user in a specific realm.
+     *
+     * @param realm The name of the realm.
+     * @param userId The ID of the user.
+     * @param accessToken The access token for authentication.
+     * @return The roles assigned to the user.
+     */
     public RoleMappings getUserRoles(String realm, String userId, String accessToken) {
         addTraceId();
         try {
@@ -112,8 +149,13 @@ public class AuthService {
         }
     }
 
-
-
+    /**
+     * Retrieves all available roles in a specific realm, including both realm roles and client roles.
+     *
+     * @param realm The name of the realm.
+     * @param token The access token for authentication.
+     * @return A map containing realm roles and client roles.
+     */
     public Map<String, Object> getAllAvailableRoles(String realm, String token) {
         Map<String, Object> allRoles = new HashMap<>();
 
@@ -138,36 +180,55 @@ public class AuthService {
         return allRoles;
     }
 
+    /**
+     * Lists all roles in a specific realm.
+     *
+     * @param realm The name of the realm.
+     * @param token The access token for authentication.
+     * @return A list of roles in the specified realm.
+     */
     public List<Map<String, String>> listRealmRoles(String realm, String token) {
-        // Call GET /admin/realms/{realm}/roles
-        // Return list of role name & description
         return keycloakClient.getAllRolesInRealm(realm, "Bearer " + token);
     }
 
+    /**
+     * Lists all clients in a specific realm.
+     *
+     * @param realm The name of the realm.
+     * @param token The access token for authentication.
+     * @return A list of clients in the specified realm.
+     */
     public List<Map<String, Object>> listClients(String realm, String token) {
         return keycloakClient.listClients(realm, "Bearer " + token);
     }
 
-    // get roles of a client by clientId
-
+    /**
+     * Lists all roles of a specific client in a realm.
+     *
+     * @param realm The name of the realm.
+     * @param clientId The ID of the client.
+     * @param token The access token for authentication.
+     * @return A list of roles for the specified client.
+     */
     public List<Map<String, String>> listClientRoles(String realm, String clientId, String token) {
-        // Call GET /admin/realms/{realm}/clients/{clientId}/roles
-        // Return list of role name & description
         return keycloakClient.getClientRoles(realm, clientId, "Bearer " + token);
     }
 
-
-
-    public void addRolesToUser(String realm, String userId, List<Map<String, String>> roles, String accessToken) {
+    /**
+     * Adds realm roles to a user.
+     * @param realm The name of the realm.
+     * @param userId The ID of the user.
+     * @param roles The list of roles to be added.
+     * @param accessToken The access token for authentication.
+     */
+    public void addRealmRolesToUser(String realm, String userId, List<Map<String, String>> roles, String accessToken) {
         addTraceId();
         try {
             for (Map<String, String> role : roles) {
                 String type = role.get("type");
                 if (type.equals("realm")) {
-                    // the roles list that will be sent to Keycloak should not contain the "type" key
-                    // so we create a new list without the "type" key
                     role.remove("type");
-                    keycloakClient.addRolesToUser(realm, userId, "Bearer " + accessToken, List.of(role));
+                    keycloakClient.addRealmRolesToUser(realm, userId, "Bearer " + accessToken, List.of(role));
                 } else if (type.startsWith("client:")) {
                     String clientName = type.split(":")[1];
                     String clientByName = keycloakClient.getClientIdByName(realm, clientName, "Bearer " + accessToken);
@@ -181,16 +242,21 @@ public class AuthService {
         }
     }
 
-    public void removeRolesFromUser(String realm, String userId, List<Map<String, String>> roles, String accessToken) {
+    /**
+     * Removes realm roles from a user.
+     * @param realm The name of the realm.
+     * @param userId The ID of the user.
+     * @param roles The list of roles to be removed.
+     * @param accessToken The access token for authentication.
+     */
+    public void removeRealmRolesFromUser(String realm, String userId, List<Map<String, String>> roles, String accessToken) {
         addTraceId();
         try {
             for (Map<String, String> role : roles) {
                 String type = role.get("type");
                 if (type.equals("realm")) {
-                    // the roles list that will be sent to Keycloak should not contain the "type" key
-                    // so we create a new list without the "type" key
                     role.remove("type");
-                    keycloakClient.removeRolesFromUser(realm, userId, "Bearer " + accessToken, List.of(role));
+                    keycloakClient.removeRealmRolesFromUser(realm, userId, "Bearer " + accessToken, List.of(role));
                 } else if (type.startsWith("client:")) {
                     String clientName = type.split(":")[1];
                     String clientByName = keycloakClient.getClientIdByName(realm, clientName, "Bearer " + accessToken);
