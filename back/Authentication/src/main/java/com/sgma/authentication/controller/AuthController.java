@@ -5,10 +5,14 @@ import com.sgma.authentication.model.ClientLogin;
 import com.sgma.authentication.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,12 +52,28 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody Map<String, String> body,
                                        @RequestHeader("Authorization") String authHeader) {
-        String realm = body.get("realm");
+        String realm = extractRealmFromToken(authHeader.replaceFirst("Bearer ", ""));
         String userId = body.get("userId");
         String token = authHeader.replaceFirst("Bearer ", "");
         authService.logout(realm, userId, token);
         return ResponseEntity.ok().build();
     }
+
+    public String extractRealmFromToken(String accessToken) {
+        String[] parts = accessToken.split("\\.");
+        if (parts.length < 2) throw new IllegalArgumentException("Invalid JWT");
+
+        String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+        JSONObject payload = new JSONObject(payloadJson);
+
+        String iss = payload.getString("iss");
+        URI issuerUri = URI.create(iss);
+        String[] pathSegments = issuerUri.getPath().split("/");
+        if (pathSegments.length < 3) throw new IllegalStateException("Unexpected issuer format");
+
+        return pathSegments[2];
+    }
+
 
     @GetMapping("/realms")
     public ResponseEntity<List<String>> realms(@RequestHeader("Authorization") String authHeader) {

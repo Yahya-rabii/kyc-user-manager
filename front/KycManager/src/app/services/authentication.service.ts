@@ -25,14 +25,7 @@ export class AuthenticationService {
       throw error;
     }
   }
-  async signup(user: User): Promise<any> {
-    const signupUrl = `${environment.AuthapiUrl}${environment.signupEndpoint}`;
-    try {
-      return await this.httpClient.post<any>(signupUrl, user).toPromise();
-    } catch (error) {
-      throw error;
-    }
-  }
+
   async logout(): Promise<void> {
     const logoutUrl = `${environment.AuthapiUrl}${environment.logoutEndpoint}`;
     const userId = this.getUserId();
@@ -45,6 +38,7 @@ export class AuthenticationService {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+
         },
         body: JSON.stringify({ userId }),
       });
@@ -65,26 +59,34 @@ export class AuthenticationService {
     const accessToken = sessionStorage.getItem('access_token');
     return accessToken !== null;
   }
-  /*
-  async getRoles(): Promise<string[]> {
-    const getRolesUrl = `${environment.AuthapiUrl}${environment.getRolesEndpoint}`;
+
+  async getRealms(): Promise<string[]> {
     const accessToken = sessionStorage.getItem('access_token');
     if (!accessToken) {
       throw new Error('No access token found in session storage');
     }
-    const headers = new HttpHeaders({
-      method: 'POST',
-      'Authorization': `Bearer ${accessToken}`
-    });
+    const getRealmsUrl = `${environment.AuthapiUrl}${environment.GetRealmsEndpoint}`;
     try {
-      const roles = await this.httpClient.post<string[]>(getRolesUrl, {}, { headers }).toPromise();
-      return roles || []; 
+      const response = await fetch(getRealmsUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data || [];
+      } else {
+        console.error('Error fetching realms:', response.statusText);
+        return [];
+      }
     } catch (error) {
-      console.error('Error fetching roles:', error);
+      console.error('Error fetching realms:', error);
       throw error;
     }
   }
-*/
+
   async getRoles(): Promise<string[]> {
     const accessToken = sessionStorage.getItem('access_token');
     if (!accessToken) {

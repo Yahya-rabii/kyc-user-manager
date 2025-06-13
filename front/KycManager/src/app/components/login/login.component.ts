@@ -15,7 +15,7 @@ import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.comp
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  isLoading: boolean = false; // State variable for loading spinner
+  isLoading: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -24,7 +24,7 @@ export class LoginComponent {
   ) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(5)]],
     });
   }
 
@@ -42,7 +42,7 @@ export class LoginComponent {
       return;
     }
 
-    this.isLoading = true; // Show loading spinner
+    this.isLoading = true;
     const formData = this.loginForm.value;
     try {
       await this.login(formData.username, formData.password);
@@ -50,18 +50,14 @@ export class LoginComponent {
       console.error('Error during login:', error);
       alert('An error occurred during login');
     } finally {
-      this.isLoading = false; // Hide loading spinner
+      this.isLoading = false;
     }
-  }
-
-  navigateToRegister() {
-    this.router.navigate(['/signup']).then();
   }
 
   public async login(username: string, password: string): Promise<void> {
     try {
       const response = await this.authService.login(username, password).then();
-      this.router.navigate(['/home']).then(() => {
+      this.router.navigate(['/dashboard/admin']).then(() => {
         window.location.reload();
       });
     } catch (error) {

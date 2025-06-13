@@ -2,7 +2,7 @@ import { formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { CommonModule } from '@angular/common';
-import { UserstableComponent } from './userstable/userstable.component';
+import { RealmstableComponent } from './realmstable/realmstable.component';
 Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
@@ -10,7 +10,7 @@ Chart.register(...registerables);
   styleUrls: ['./dashboard.component.css'],
   imports: [
     CommonModule,
-    UserstableComponent,
+    RealmstableComponent,
   ],
   standalone: true,
 })

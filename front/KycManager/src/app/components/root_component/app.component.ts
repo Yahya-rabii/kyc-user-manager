@@ -54,12 +54,6 @@ import {
   MatSidenavModule
 } from '@angular/material/sidenav';
 import {
-  CustomSideComponent
-} from '../side/custom-side.component';
-import {
-  UsersService
-} from '../../services/user.service';
-import {
   User
 } from '../../models/user.model';
 import {
@@ -77,12 +71,10 @@ import {
     RouterOutlet,
     LoginComponent,
     FooterComponent,
-    NavBarComponent,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatSidenavModule,
-    CustomSideComponent,
     CercularnavComponent,
     LoadingSpinnerComponent,
   ],
@@ -118,13 +110,11 @@ export class AppComponent implements OnInit {
 
   constructor(
     private authService: AuthenticationService,
-    private usersService: UsersService,
     private router: Router,
     private refreshToken: TokenRefreshService,
   ) { }
 
   ngOnInit(): void {
-    this.isEmailValid = this.usersService.getUserEmailVerified();
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationStart),
@@ -160,19 +150,4 @@ export class AppComponent implements OnInit {
     this.authService.logout();
   }
 
-  getCurrentUser() {
-    const userId: string = this.authService.getUserId();
-    return this.usersService.getUserById(userId).then((user) => {
-      this.user = user;
-      this.hasAccount = user.hasAccount;
-    });
-  }
-
-  createAccount() {
-    this.router.navigate(['account/create-account']).then();
-  }
-
-  toValidate() {
-    this.router.navigate(['/enable']).then();
-  }
 }
