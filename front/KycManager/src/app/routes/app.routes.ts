@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from '../guards/auth.guard';
 import { NoAuthGuard } from '../guards/No.auth.guard';
-import { UserGuard } from '../guards/user.guard';
 export const routes: Routes = [
 
   {
@@ -17,13 +16,13 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () =>
       import('../components/home/home.component').then((m) => m.HomeComponent),
-    canActivate: [AuthGuard, UserGuard],
+    canActivate: [AuthGuard],
   },
 
   {
     path: 'admin',
     loadChildren: () => import('./admin.routes').then((m) => m.ADMIN_ROUTES),
-    canActivate: [AuthGuard, UserGuard],
+    canActivate: [AuthGuard],
   },
 
   { path: '**', redirectTo: 'home' },

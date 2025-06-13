@@ -32,6 +32,7 @@ export class NavBarComponent implements OnInit {
     if (drawerNavigation) {
       drawerNavigation.setAttribute('data-drawer-show', 'none');
     }
+    this.isLoggedIn();
   }
   islogin: boolean = false;
   isLoggedIn() {

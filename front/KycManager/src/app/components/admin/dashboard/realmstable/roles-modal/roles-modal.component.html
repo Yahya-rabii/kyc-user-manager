@@ -1,0 +1,91 @@
+<div class="modal-backdrop fullscreen">
+  <div class="modal-content fullscreen-container">
+    <div class="modal-header flex justify-between items-center">
+      <h2 class="text-2xl font-bold">
+        Edit Roles for {{ user.username }} in realm {{ realm }}
+      </h2>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    <div *ngIf="loadingRoles" class="p-4">Loading roles...</div>
+    <div *ngIf="error" class="error p-4">{{ error }}</div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 p-4">
+      <select [(ngModel)]="selectedTypeFilter" class="p-2 border rounded">
+        <option value="">All</option>
+        <option value="realm">Realm Roles</option>
+        <option
+          *ngFor="let client of getClientIds()"
+          [value]="'client:' + client"
+        >
+          Client: {{ client }}
+        </option>
+      </select>
+
+      <input
+        type="text"
+        placeholder="Search available roles"
+        [(ngModel)]="roleSearchTerm"
+        class="p-2 border rounded flex-1"
+      />
+    </div>
+
+    <!-- Available Roles Grid -->
+    <div class="section-title px-4 pt-2 text-lg font-semibold">Available Roles</div>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 overflow-y-auto max-h-[40vh]">
+      <div
+        *ngFor="let role of paginatedRoles()"
+        (click)="toggleSelectRole(role)"
+        [class.bg-green-200]="isRoleSelected(role)"
+        class="cursor-pointer border p-3 rounded shadow hover:bg-green-50 dark:hover:bg-green-900"
+      >
+        {{ role.name }} <br />
+        <span class="text-xs text-gray-500">({{ role.type }})</span>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="flex justify-center gap-2 p-4">
+      <button
+        class="px-3 py-1 rounded border"
+        (click)="currentPage = currentPage - 1"
+        [disabled]="currentPage === 1"
+      >
+        Previous
+      </button>
+      <span>Page {{ currentPage }} of {{ totalPages() }}</span>
+      <button
+        class="px-3 py-1 rounded border"
+        (click)="currentPage = currentPage + 1"
+        [disabled]="currentPage === totalPages()"
+      >
+        Next
+      </button>
+    </div>
+
+    <!-- Assigned Roles Grid -->
+    <div class="section-title px-4 pt-4 text-lg font-semibold">Currently Assigned Roles</div>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 bg-gray-100 dark:bg-gray-800 rounded max-h-[30vh] overflow-y-auto">
+      <div
+        *ngFor="let role of selectedRoles"
+        (click)="toggleSelectRole(role)"
+        class="cursor-pointer border p-3 rounded shadow hover:bg-red-100 dark:hover:bg-red-900"
+      >
+        {{ role.name }} <br />
+        <span class="text-xs text-gray-500">({{ role.type }})</span>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="p-4">
+      <button
+        (click)="submitSelectedRoles()"
+        [disabled]="processing"
+        class="bg-blue-600 text-white px-6 py-2 rounded shadow"
+      >
+        Submit Changes
+      </button>
+    </div>
+  </div>
+</div>

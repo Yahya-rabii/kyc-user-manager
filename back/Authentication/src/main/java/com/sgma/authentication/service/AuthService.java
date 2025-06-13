@@ -2,6 +2,7 @@ package com.sgma.authentication.service;
 
 import com.sgma.authentication.client.KeycloakClient;
 import com.sgma.authentication.model.ClientLogin;
+import com.sgma.authentication.model.RoleMappings;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,10 +103,79 @@ public class AuthService {
         }
     }
 
+    public RoleMappings getUserRoles(String realm, String userId, String accessToken) {
+        addTraceId();
+        try {
+            return keycloakClient.getUserRoles(realm, userId, "Bearer " + accessToken);
+        } finally {
+            clearTrace();
+        }
+    }
+
+
+
+    public Map<String, Object> getAllAvailableRoles(String realm, String token) {
+        Map<String, Object> allRoles = new HashMap<>();
+
+        // Fetch realm roles
+        List<Map<String, String>> realmRoles = listRealmRoles(realm, token);
+        allRoles.put("realmRoles", realmRoles);
+
+        // Fetch clients
+        List<Map<String, Object>> clients = listClients(realm, token);
+
+        // For each client, get roles
+        Map<String, List<Map<String, String>>> clientRolesMap = new HashMap<>();
+        for (Map<String, Object> client : clients) {
+            String clientId = (String) client.get("id");
+            String clientName = (String) client.get("clientId");
+
+            List<Map<String, String>> clientRoles = listClientRoles(realm, clientId, token);
+            clientRolesMap.put(clientName, clientRoles);
+        }
+
+        allRoles.put("clientRoles", clientRolesMap);
+        return allRoles;
+    }
+
+    public List<Map<String, String>> listRealmRoles(String realm, String token) {
+        // Call GET /admin/realms/{realm}/roles
+        // Return list of role name & description
+        return keycloakClient.getAllRolesInRealm(realm, "Bearer " + token);
+    }
+
+    public List<Map<String, Object>> listClients(String realm, String token) {
+        return keycloakClient.listClients(realm, "Bearer " + token);
+    }
+
+    // get roles of a client by clientId
+
+    public List<Map<String, String>> listClientRoles(String realm, String clientId, String token) {
+        // Call GET /admin/realms/{realm}/clients/{clientId}/roles
+        // Return list of role name & description
+        return keycloakClient.getClientRoles(realm, clientId, "Bearer " + token);
+    }
+
+
+
     public void addRolesToUser(String realm, String userId, List<Map<String, String>> roles, String accessToken) {
         addTraceId();
         try {
-            keycloakClient.addRolesToUser(realm, userId, "Bearer " + accessToken, roles);
+            for (Map<String, String> role : roles) {
+                String type = role.get("type");
+                if (type.equals("realm")) {
+                    // the roles list that will be sent to Keycloak should not contain the "type" key
+                    // so we create a new list without the "type" key
+                    role.remove("type");
+                    keycloakClient.addRolesToUser(realm, userId, "Bearer " + accessToken, List.of(role));
+                } else if (type.startsWith("client:")) {
+                    String clientName = type.split(":")[1];
+                    String clientByName = keycloakClient.getClientIdByName(realm, clientName, "Bearer " + accessToken);
+                    String clientIdByName = clientByName.split(",")[0].split(":")[1].replaceAll("[{}\"]", "");
+                    role.remove("type");
+                    keycloakClient.addClientRolesToUser(realm, userId, clientIdByName, "Bearer " + accessToken, List.of(role));
+                }
+            }
         } finally {
             clearTrace();
         }
@@ -116,9 +184,31 @@ public class AuthService {
     public void removeRolesFromUser(String realm, String userId, List<Map<String, String>> roles, String accessToken) {
         addTraceId();
         try {
-            keycloakClient.removeRolesFromUser(realm, userId, "Bearer " + accessToken, roles);
+            for (Map<String, String> role : roles) {
+                String type = role.get("type");
+                if (type.equals("realm")) {
+                    // the roles list that will be sent to Keycloak should not contain the "type" key
+                    // so we create a new list without the "type" key
+                    role.remove("type");
+                    keycloakClient.removeRolesFromUser(realm, userId, "Bearer " + accessToken, List.of(role));
+                } else if (type.startsWith("client:")) {
+                    String clientName = type.split(":")[1];
+                    String clientByName = keycloakClient.getClientIdByName(realm, clientName, "Bearer " + accessToken);
+                    String clientIdByName = clientByName.split(",")[0].split(":")[1].replaceAll("[{}\"]", "");
+                    role.remove("type");
+                    keycloakClient.removeClientRolesFromUser(realm, userId, clientIdByName, "Bearer " + accessToken, List.of(role));
+                }
+            }
         } finally {
             clearTrace();
         }
     }
+
+
+
+
+
+
+
+
 }

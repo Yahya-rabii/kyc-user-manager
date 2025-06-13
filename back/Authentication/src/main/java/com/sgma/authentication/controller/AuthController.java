@@ -2,6 +2,7 @@ package com.sgma.authentication.controller;
 
 
 import com.sgma.authentication.model.ClientLogin;
+import com.sgma.authentication.model.RoleMappings;
 import com.sgma.authentication.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Log4j2
+@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}, allowCredentials = "true")
 public class AuthController {
     private final AuthService authService;
 
@@ -39,7 +41,8 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refresh(@RequestBody Map<String, String> body) {
-        ResponseEntity<Map<String, Object>> responseEntity = authService.refresh(body.get("refresh_token"));
+        String refreshToken = body.get("refresh_token");
+        ResponseEntity<Map<String, Object>> responseEntity = authService.refresh(refreshToken);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             Map<String, String> tokenResponse = responseEntity.getBody().entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString()));
@@ -48,6 +51,7 @@ public class AuthController {
         log.error("Token refresh failed: {}", responseEntity.getStatusCode());
         return ResponseEntity.status(responseEntity.getStatusCode()).body(null);
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody Map<String, String> body,
@@ -88,6 +92,29 @@ public class AuthController {
         return ResponseEntity.ok(authService.listUsersInRealm(realm, token));
     }
 
+    @GetMapping("/realms/{realm}/users/{userId}/roles")
+    public ResponseEntity<RoleMappings> getUserRoles(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String realm,
+            @PathVariable String userId) {
+        String token = authHeader.replaceFirst("Bearer ", "");
+        RoleMappings roles = authService.getUserRoles(realm, userId, token);
+        return ResponseEntity.ok(roles);
+    }
+
+    //I want to create a method that will do this. My app basically will allow a user to modify the roles of other users. So, if this user click on a modified user he wants to modify and click on a button, he will get all the roles of the realm of this user and also he will get all the roles of clients which are in the same realm. The same as what we have in the Keycock interface. When you want to assign a role to a user, it gives you the possibility to assign roles of realm and assign roles of clients. I want to do the same thing in my application. So, modify this backend applications to ensure that I will have a method to fit the realms roles, the realm roles, and the client roles of the same realm.
+
+    @GetMapping("/realms/{realm}/available-roles")
+    public ResponseEntity<Map<String, Object>> getAllAvailableRoles(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String realm) {
+        String token = authHeader.replace("Bearer ", "");
+        Map<String, Object> roles = authService.getAllAvailableRoles(realm, token);
+        return ResponseEntity.ok(roles);
+    }
+
+
+
     @PostMapping("/realms/{realm}/users/{userId}/roles")
     public ResponseEntity<Void> addRoles(@RequestHeader("Authorization") String authHeader,
                                          @PathVariable String realm,
@@ -107,4 +134,5 @@ public class AuthController {
         authService.removeRolesFromUser(realm, userId, roles, token);
         return ResponseEntity.ok().build();
     }
+
 }

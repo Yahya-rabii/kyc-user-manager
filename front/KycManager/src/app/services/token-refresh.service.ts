@@ -28,59 +28,60 @@ export class TokenRefreshService {
       );
   }
   private checkTokenExpiration(): Observable<void> {
-    return new Observable<void>((observer) => {
-      const expiresAt = sessionStorage.getItem('expires_in');
-      const currentTime = Date.now();
-      console.log('Current time:', currentTime);
-      console.log('Token expires at:', expiresAt);
-      if (
-        expiresAt &&
-        currentTime >= parseInt(expiresAt) - this.tokenExpirationThreshold
-      ) {
-        const refreshToken = sessionStorage.getItem('refresh_token');
-        if (refreshToken) {
-          this.refreshAccessToken(refreshToken).then(
-            (response) => {
-              sessionStorage.setItem('access_token', response.access_token);
-              sessionStorage.setItem('refresh_token', response.refresh_token);
-              sessionStorage.setItem(
-                'expires_in',
-                response.expires_in.toString(),
-              );
-              sessionStorage.setItem(
-                'refresh_expires_in',
-                response.refresh_expires_in.toString(),
-              );
-              sessionStorage.setItem('token_type', response.token_type);
-              console.log('Token refreshed successfully');
-              observer.next();
-              observer.complete();
-            },
-            (error) => {
-              console.error('Error refreshing token:', error);
-              observer.error(error);
-            },
-          );
-        } else {
-          console.log('No refresh token found');
-          observer.complete();
-        }
+  return new Observable<void>((observer) => {
+    const expiresAtStr = sessionStorage.getItem('expires_at');
+    const currentTime = Date.now();
+
+    if (
+      expiresAtStr &&
+      currentTime >= parseInt(expiresAtStr) - this.tokenExpirationThreshold
+    ) {
+      const refreshToken = sessionStorage.getItem('refresh_token');
+      if (refreshToken) {
+        this.refreshAccessToken(refreshToken).then(
+          (response) => {
+            const now = Date.now();
+            const newExpiresAt = now + response.expires_in * 1000;
+            const newRefreshExpiresAt = now + response.refresh_expires_in * 1000;
+
+            sessionStorage.setItem('access_token', response.access_token);
+            sessionStorage.setItem('refresh_token', response.refresh_token);
+            sessionStorage.setItem('expires_at', newExpiresAt.toString());
+            sessionStorage.setItem('refresh_expires_at', newRefreshExpiresAt.toString());
+            sessionStorage.setItem('token_type', response.token_type);
+
+            console.log('Token refreshed successfully');
+            observer.next();
+            observer.complete();
+          },
+          (error) => {
+            console.error('Error refreshing token:', error);
+            observer.error(error);
+          },
+        );
       } else {
+        console.log('No refresh token found');
         observer.complete();
       }
-    });
-  }
-  private async refreshAccessToken(refreshToken: string): Promise<any> {
-    const refreshTokenUrl = `${environment.AuthapiUrl}${environment.refreshEndpoint}`;
-    const response = await fetch(refreshTokenUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: refreshToken,
-    });
-    if (response.ok) {
-      return response.json();
     } else {
-      throw new Error(`Error refreshing token: ${response.statusText}`);
+      observer.complete();
     }
+  });
+}
+
+  private async refreshAccessToken(refreshToken: string): Promise<any> {
+  const refreshTokenUrl = `${environment.AuthapiUrl}${environment.refreshEndpoint}`;
+  const response = await fetch(refreshTokenUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  });
+
+  if (response.ok) {
+    return response.json();
+  } else {
+    throw new Error(`Error refreshing token: ${response.statusText}`);
   }
+}
+
 }

@@ -1,0 +1,5 @@
+/* Basic focus outline for accessibility */
+div[role="button"]:focus {
+  outline: 2px solid #14b8a6; /* teal-500 */
+  outline-offset: 2px;
+}

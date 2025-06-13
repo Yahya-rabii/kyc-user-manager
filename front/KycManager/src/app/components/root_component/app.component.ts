@@ -62,7 +62,7 @@ import {
 import {
   LoadingSpinnerComponent
 } from '../loading-spinner/loading-spinner.component';
-
+// import app nav bar
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -77,6 +77,7 @@ import {
     MatSidenavModule,
     CercularnavComponent,
     LoadingSpinnerComponent,
+    NavBarComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
@@ -100,9 +101,6 @@ import {
 })
 export class AppComponent implements OnInit {
   title = 'appcc-front';
-  isAdmin: Boolean = false;
-  hasAccount: Boolean = false;
-  isEmailValid: Boolean = false;
   user: User = new User();
   collapsed = signal(false);
   sidenavWidth = computed(() => (this.collapsed() ? '65px' : '250px'));

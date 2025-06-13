@@ -1,51 +1,220 @@
-<div class="card m-4" *ngIf="getRealmsCount() === 0">
-  <div class="card-title flex justify-between items-center mb-4">
-    <h3 class="text-xl font-bold leading-none text-black">Realms List</h3>
-  </div>
-  <div
-    class="overflow-y-auto overflow-x-hidden pr-4 p-8 bg-white rounded-lg opacity-80"
-    style="max-height: 535px"
-  >
-    <h1
-      class="text-2xl font-semibold text-slate-600 text-center mt-5 animate-bounce"
-    >
-      No Realms Found
-    </h1>
-  </div>
-</div>
-<div>
-  <div class="card m-4" *ngIf="getRealmsCount() > 0">
-    <div class="card-title flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold leading-none text-black">Clients List</h3>
-    </div>
-    <div
-      class="overflow-y-auto overflow-x-hidden pr-4 p-4 bg-white rounded-lg opacity-80"
-      style="max-height: 535px"
-    >
-      <div class="flow-root bg-white rounded-lg opacity-80">
-        <ul role="list" class="divide-y divide-gray-200">
-          <li class="sm:py-4" *ngFor="let realm of realms">
-            <div class="flex items-center space-x-4">
-              <div class="flex-shrink-0">
-                <img
-                  class="w-8 h-8 rounded-full"
-                  src="/assets/img/profiles/user.png"
-                  alt="user image"
-                />
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">
-                  {{ realm }}
-                </p>
-              </div>
-              <div
-                class="inline-flex items-center text-base font-semibold text-gray-900"
-              >
-              </div>
-            </div>
-          </li>
-        </ul>
+<!-- Realms container -->
+<div class="relative shadow-md rounded-lg bg-white dark:bg-gray-800 w-full my-4">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-0">Realms List</h3>
+    <div class="relative w-full sm:w-64">
+      <input
+        type="text"
+        placeholder="Search Realms by name..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+        class="block w-full pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-400 dark:focus:border-teal-400"
+      />
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg
+          class="w-5 h-5 text-gray-400 dark:text-gray-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
       </div>
     </div>
   </div>
+
+  <div class="p-6 w-full">
+    <ng-container *ngIf="filteredRealms.length === 0">
+      <h1 class="text-2xl font-semibold text-gray-600 dark:text-gray-400 text-center mt-6 animate-bounce">
+        No Realms Found
+      </h1>
+    </ng-container>
+
+    <ng-container *ngIf="filteredRealms.length > 0">
+      <div class="w-full mx-auto">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"
+          style="width: 100%;"
+        >
+          <div
+            *ngFor="let realm of paginatedRealms"
+            (click)="onRealmClick(realm)"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Realm ' + realm"
+            class="cursor-pointer rounded-lg shadow hover:bg-teal-100 transition p-4 flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-teal-500"
+          >
+            <img
+              src="/assets/img/profiles/user.png"
+              alt="realm image"
+              class="w-16 h-16 rounded-full mb-2"
+            />
+            <p
+              class="text-center font-semibold text-gray-900 dark:text-gray-100 truncate w-full"
+              title="{{ realm }}"
+            >
+              {{ realm }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Realms Pagination -->
+      <div class="flex justify-center mt-6 space-x-2 select-none">
+        <button
+          (click)="goToPage(page - 1)"
+          [disabled]="page === 1"
+          class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+        >
+          Prev
+        </button>
+
+        <button
+          *ngFor="let _ of [].constructor(totalPages()); let i = index"
+          (click)="goToPage(i + 1)"
+          [class.font-bold]="page === i + 1"
+          class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+          [class.bg-teal-200]="page === i + 1"
+          [class.dark:bg-teal-600]="page === i + 1"
+        >
+          {{ i + 1 }}
+        </button>
+
+        <button
+          (click)="goToPage(page + 1)"
+          [disabled]="page === totalPages()"
+          class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+        >
+          Next
+        </button>
+      </div>
+    </ng-container>
+  </div>
+
+
+
+
+
+
+
+
+<!-- Users table: shows only if a realm is selected -->
+<div *ngIf="selectedRealm" class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8 border border-gray-300 dark:border-gray-600 rounded-lg p-6 bg-white dark:bg-gray-800">
+  <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Users in realm: {{ selectedRealm }}</h2>
+
+  <!-- User search input aligned right like realms -->
+  <div class="relative w-64 ml-auto mb-4">
+    <input
+      type="text"
+      placeholder="Search users by username..."
+      [(ngModel)]="userSearchTerm"
+      (input)="applyUserFilter()"
+      class="block w-full pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-400 dark:focus:border-teal-400"
+    />
+    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      <svg
+        class="w-5 h-5 text-gray-400 dark:text-gray-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div *ngIf="loadingUsers" class="mb-4 text-gray-700 dark:text-gray-300">Loading users...</div>
+  <div *ngIf="usersError" class="mb-4 text-red-600">{{ usersError }}</div>
+
+  <table *ngIf="!loadingUsers && filteredUsers.length > 0" class="w-full text-sm text-left text-gray-700 dark:text-gray-300 border-collapse">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Username</th>
+        <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Email</th>
+        <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600 text-center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let user of paginatedUsers"
+        class="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+      >
+        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          {{ user.username }}
+        </th>
+        <td class="px-6 py-4">
+          {{ user.email || '-' }}
+        </td>
+        <td class="px-6 py-4 text-center">
+          <!-- Ellipsis '...' button with styling -->
+          <button
+            type="button"
+            aria-label="Edit user"
+            class="relative inline-flex items-center justify-center w-8 h-8 rounded-full ..."
+            (click)="onEditUserRoles(user)"
+          >
+
+            <svg
+              class="w-5 h-5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <circle cx="6" cy="10" r="2" />
+              <circle cx="10" cy="10" r="2" />
+              <circle cx="14" cy="10" r="2" />
+            </svg>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loadingUsers && filteredUsers.length === 0" class="text-gray-600 dark:text-gray-400">
+    No users found in this realm.
+  </div>
+
+  <!-- Users Pagination -->
+  <div *ngIf="filteredUsers.length > 0" class="flex justify-center mt-6 space-x-2 select-none">
+    <button
+      (click)="goToUserPage(userPage - 1)"
+      [disabled]="userPage === 1"
+      class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+    >
+      Prev
+    </button>
+
+    <button
+      *ngFor="let _ of [].constructor(totalUserPages()); let i = index"
+      (click)="goToUserPage(i + 1)"
+      [class.font-bold]="userPage === i + 1"
+      class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+      [class.bg-teal-200]="userPage === i + 1"
+      [class.dark:bg-teal-600]="userPage === i + 1"
+    >
+      {{ i + 1 }}
+    </button>
+
+    <button
+      (click)="goToUserPage(userPage + 1)"
+      [disabled]="userPage === totalUserPages()"
+      class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+    >
+      Next
+    </button>
+  </div>
 </div>
+
+<!-- User roles modal -->
+<app-user-roles-modal
+  *ngIf="editingUser && selectedRealm"
+  [realm]="selectedRealm"
+  [user]="editingUser"
+  (close)="closeRolesModal()"
+  (rolesUpdated)="onRolesUpdated()"
+></app-user-roles-modal>

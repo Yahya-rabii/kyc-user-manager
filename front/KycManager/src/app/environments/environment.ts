@@ -14,4 +14,5 @@ export const environment = {
   validateSecretEndpoint: '/verifySecret/',
   GetRealmsEndpoint: '/realms',
 
+
 };

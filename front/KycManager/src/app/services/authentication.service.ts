@@ -8,10 +8,9 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthenticationService {
-  constructor(
-    private httpClient: HttpClient,
-    private router: Router,
-  ) {}
+
+  constructor(private httpClient: HttpClient,private router: Router,) {}
+
   async login(username: string, password: string): Promise<any> {
     const loginUrl = `${environment.AuthapiUrl}${environment.loginEndpoint}`;
     const credentials = { username, password };
@@ -55,62 +54,13 @@ export class AuthenticationService {
       console.error('Error logging out:', error);
     }
   }
+
   isLoggedIn(): boolean {
     const accessToken = sessionStorage.getItem('access_token');
+    console.log('the user is logged in service:', accessToken !== null);
     return accessToken !== null;
   }
 
-  async getRealms(): Promise<string[]> {
-    const accessToken = sessionStorage.getItem('access_token');
-    if (!accessToken) {
-      throw new Error('No access token found in session storage');
-    }
-    const getRealmsUrl = `${environment.AuthapiUrl}${environment.GetRealmsEndpoint}`;
-    try {
-      const response = await fetch(getRealmsUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data || [];
-      } else {
-        console.error('Error fetching realms:', response.statusText);
-        return [];
-      }
-    } catch (error) {
-      console.error('Error fetching realms:', error);
-      throw error;
-    }
-  }
-
-  async getRoles(): Promise<string[]> {
-    const accessToken = sessionStorage.getItem('access_token');
-    if (!accessToken) {
-      throw new Error('No access token found in session storage');
-    }
-    return new Promise<string[]>((resolve, reject) => {
-      try {
-        const tokenParts = accessToken.split('.');
-        if (tokenParts.length < 2) {
-          throw new Error('Invalid JWT token');
-        }
-        const encodedPayload = tokenParts[1];
-        const decodedPayload = atob(
-          encodedPayload.replace(/-/g, '+').replace(/_/g, '/'),
-        );
-        const payloadJson = JSON.parse(decodedPayload);
-        const roles = payloadJson.realm_access?.roles || [];
-        resolve(roles);
-      } catch (error) {
-        console.error('Error decoding token or extracting roles:', error);
-        reject(error);
-      }
-    });
-  }
   getUserId(): string {
     const accessToken = sessionStorage.getItem('access_token');
     if (!accessToken) {
@@ -127,63 +77,22 @@ export class AuthenticationService {
     const payloadJson = JSON.parse(decodedPayload);
     return payloadJson.sub;
   }
-  async isAdmin(): Promise<boolean> {
-    try {
-      const response = await this.getRoles();
-      return response.includes('ADMIN');
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      return false;
-    }
-  }
+
   public setsessionStorage(response: any): void {
-    sessionStorage.setItem('access_token', response.access_token);
-    sessionStorage.setItem('refresh_token', response.refresh_token);
-    sessionStorage.setItem('expires_in', response.expires_in.toString());
-    sessionStorage.setItem(
-      'refresh_expires_in',
-      response.refresh_expires_in.toString(),
-    );
-    sessionStorage.setItem('token_type', response.token_type);
-  }
+  const now = Date.now();
+  const expiresInMs = now + response.expires_in * 1000;
+  const refreshExpiresInMs = now + response.refresh_expires_in * 1000;
+
+  sessionStorage.setItem('access_token', response.access_token);
+  sessionStorage.setItem('refresh_token', response.refresh_token);
+  sessionStorage.setItem('expires_at', expiresInMs.toString());
+  sessionStorage.setItem('refresh_expires_at', refreshExpiresInMs.toString());
+  sessionStorage.setItem('token_type', response.token_type);
+}
+
+
   private clearsessionStorage(): void {
     sessionStorage.clear();
   }
-  async validateSecret(secret: string): Promise<boolean> {
-    const userId = this.getUserId();
-    const refreshToken = sessionStorage.getItem('refresh_token') || '';
-    console.log('refreshToken', refreshToken);
-    console.log('userId', userId);
-    const validateSecretUrl = `${environment.AuthapiUrl}${environment.validateSecretEndpoint}${userId}`;
-    try {
-      const response = await fetch(validateSecretUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken: refreshToken, secretKey: secret }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        sessionStorage.setItem('access_token', data.access_token);
-        sessionStorage.setItem('refresh_token', data.refresh_token);
-        sessionStorage.setItem('expires_in', data.expires_in.toString());
-        sessionStorage.setItem(
-          'refresh_expires_in',
-          data.refresh_expires_in.toString(),
-        );
-        sessionStorage.setItem('token_type', data.token_type);
-        return true;
-      } else {
-        console.error('Error verifying secret:', response.statusText);
-        return false;
-      }
-    } catch (error) {
-      console.error('Error verifying secret:', error);
-      throw error;
-    }
-  }
-}
-function jwt_decode(accessToken: string): any {
-  throw new Error('Function not implemented.');
+
 }
