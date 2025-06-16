@@ -4,29 +4,25 @@ import { from } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AppLogicService } from '../../../../services/app.logic.service';
 import { UserRolesModalComponent } from './roles-modal/roles-modal.component';
-interface User {
-  id: string;
-  username: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-}
+import { BulkUserRolesModalComponent } from './bulk-roles-modal/bulk-roles-modal.component';
+import { User } from '../../../../models/user.model';
 
 @Component({
   selector: 'app-realmstable',
   standalone: true,
-  imports: [CommonModule, FormsModule , UserRolesModalComponent],
+  imports: [CommonModule, FormsModule , UserRolesModalComponent , BulkUserRolesModalComponent],
   templateUrl: './realmstable.component.html',
   styleUrls: ['./realmstable.component.css'],
 })
 export class RealmstableComponent implements OnInit {
+
   // Realms data and search
   realms: string[] = [];
   filteredRealms: string[] = [];
   searchTerm: string = '';
   page: number = 1;
   pageSize: number = 12;
-
+  bulkRolesModalOpen = false;
   // Selected realm and users
   selectedRealm: string | null = null;
   users: User[] = [];
@@ -40,6 +36,36 @@ export class RealmstableComponent implements OnInit {
  // For role editing modal
   editingUser: User | null = null;
 
+  // Open bulk roles modal
+  openBulkRolesModal() {
+    this.bulkRolesModalOpen = true;
+  }
+
+  // Close bulk roles modal
+  closeBulkRolesModal() {
+    this.bulkRolesModalOpen = false;
+  }
+
+  // Check if any user is selected
+  hasSelectedUsers(): boolean {
+    return this.filteredUsers.some(u => u.selected);
+  }
+
+  // Select/deselect all visible users
+  toggleSelectAll(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.paginatedUsers.forEach(u => (u.selected = checked));
+  }
+
+  // Optionally update "select all" checkbox state or other logic
+  onUserSelectionChange(user: User) {
+    // you can add logic here if needed, e.g. updating select all checkbox state
+  }
+
+  // Get selected users array for modal input
+  get selectedUsersForBulk() {
+    return this.filteredUsers.filter(u => u.selected);
+  }
   // When user clicks edit button for roles
   onEditUserRoles(user: User) {
     this.editingUser = user;
@@ -150,4 +176,9 @@ export class RealmstableComponent implements OnInit {
     if (n < 1 || n > this.totalUserPages()) return;
     this.userPage = n;
   }
+
+  allUsersSelected(): boolean {
+    return this.filteredUsers.length > 0 && this.filteredUsers.every(u => u.selected);
+  }
+
 }

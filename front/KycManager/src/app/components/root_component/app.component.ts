@@ -30,17 +30,11 @@ import {
   LoginComponent
 } from '../login/login.component';
 import {
-  FooterComponent
-} from '../footer/footer.component';
-import {
   NavBarComponent
 } from '../nav-bar/nav-bar.component';
 import {
   AuthenticationService
 } from '../../services/authentication.service';
-import {
-  CercularnavComponent
-} from '../cercularnav/cercularnav.component';
 import {
   MatToolbarModule
 } from '@angular/material/toolbar';
@@ -69,13 +63,10 @@ import {
   imports: [
     CommonModule,
     RouterOutlet,
-    LoginComponent,
-    FooterComponent,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatSidenavModule,
-    CercularnavComponent,
     LoadingSpinnerComponent,
     NavBarComponent
   ],

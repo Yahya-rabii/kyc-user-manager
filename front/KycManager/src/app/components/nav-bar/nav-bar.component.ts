@@ -6,7 +6,6 @@ import { User } from '../../models/user.model';
 import { OnInit } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { CercularnavComponent } from '../cercularnav/cercularnav.component';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
@@ -14,7 +13,6 @@ import { CercularnavComponent } from '../cercularnav/cercularnav.component';
     CommonModule,
     MatToolbarModule,
     MatIconModule,
-    CercularnavComponent,
   ],
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.css'],
@@ -71,5 +69,10 @@ export class NavBarComponent implements OnInit {
         document.body.classList.remove('sidebar-open');
       }
     }
+  }
+  navigateToRealms() {
+    this.router.navigate(['/kyc/realms']).then(() => {
+      window.location.reload();
+    });
   }
 }

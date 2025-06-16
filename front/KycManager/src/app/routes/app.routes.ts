@@ -13,15 +13,8 @@ export const routes: Routes = [
   },
 
   {
-    path: 'home',
-    loadComponent: () =>
-      import('../components/home/home.component').then((m) => m.HomeComponent),
-    canActivate: [AuthGuard],
-  },
-
-  {
-    path: 'admin',
-    loadChildren: () => import('./admin.routes').then((m) => m.ADMIN_ROUTES),
+    path: 'kyc',
+    loadChildren: () => import('./kyc.routes').then((m) => m.ADMIN_ROUTES),
     canActivate: [AuthGuard],
   },
 

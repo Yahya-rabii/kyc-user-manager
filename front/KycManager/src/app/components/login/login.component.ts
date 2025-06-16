@@ -57,7 +57,7 @@ export class LoginComponent {
   public async login(username: string, password: string): Promise<void> {
     try {
       const response = await this.authService.login(username, password).then();
-      this.router.navigate(['/admin/dashboard']).then(() => {
+      this.router.navigate(['/kyc/realms']).then(() => {
         window.location.reload();
       });
     } catch (error) {

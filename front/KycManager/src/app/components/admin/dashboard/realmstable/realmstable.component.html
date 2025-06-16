@@ -1,5 +1,5 @@
 <!-- Realms container -->
-<div class="relative shadow-md rounded-lg bg-white dark:bg-gray-800 w-full my-4">
+<div class="relative shadow-md rounded-lg bg-white dark:bg-gray-800 w-full my-4 mt-28">
   <div class="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-0">Realms List</h3>
     <div class="relative w-full sm:w-64">
@@ -47,7 +47,7 @@
             class="cursor-pointer rounded-lg shadow hover:bg-teal-100 transition p-4 flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <img
-              src="/assets/img/profiles/user.png"
+              src="/assets/logo.png"
               alt="realm image"
               class="w-16 h-16 rounded-full mb-2"
             />
@@ -131,48 +131,59 @@
   <div *ngIf="usersError" class="mb-4 text-red-600">{{ usersError }}</div>
 
   <table *ngIf="!loadingUsers && filteredUsers.length > 0" class="w-full text-sm text-left text-gray-700 dark:text-gray-300 border-collapse">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
-      <tr>
-        <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Username</th>
-        <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Email</th>
-        <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600 text-center">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        *ngFor="let user of paginatedUsers"
-        class="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-      >
-        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-          {{ user.username }}
-        </th>
-        <td class="px-6 py-4">
-          {{ user.email || '-' }}
-        </td>
-        <td class="px-6 py-4 text-center">
-          <!-- Ellipsis '...' button with styling -->
-          <button
-            type="button"
-            aria-label="Edit user"
-            class="relative inline-flex items-center justify-center w-8 h-8 rounded-full ..."
-            (click)="onEditUserRoles(user)"
-          >
+    <thead>
+  <tr>
+    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">
+      <input type="checkbox" (change)="toggleSelectAll($event)" [checked]="allUsersSelected()" aria-label="Select all users" />
+    </th>
+    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Username</th>
+    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Email</th>
+    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600 text-center">Action</th>
+  </tr>
+</thead>
 
-            <svg
-              class="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <circle cx="6" cy="10" r="2" />
-              <circle cx="10" cy="10" r="2" />
-              <circle cx="14" cy="10" r="2" />
-            </svg>
-          </button>
-        </td>
-      </tr>
-    </tbody>
+<tbody>
+  <tr
+    *ngFor="let user of paginatedUsers"
+    class="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+  >
+    <td class="px-6 py-4 text-center">
+      <input
+        type="checkbox"
+        [(ngModel)]="user.selected"
+        (change)="onUserSelectionChange(user)"
+        [attr.aria-label]="'Select user ' + user.username"
+      />
+    </td>
+    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+      {{ user.username }}
+    </th>
+    <td class="px-6 py-4">
+      {{ user.email || '-' }}
+    </td>
+    <td class="px-6 py-4 text-center">
+      <!-- Ellipsis '...' button with styling -->
+      <button
+        type="button"
+        aria-label="Edit user"
+        class="relative inline-flex items-center justify-center w-8 h-8 rounded-full ..."
+        (click)="onEditUserRoles(user)"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <circle cx="6" cy="10" r="2" />
+          <circle cx="10" cy="10" r="2" />
+          <circle cx="14" cy="10" r="2" />
+        </svg>
+      </button>
+    </td>
+  </tr>
+</tbody>
   </table>
 
   <div *ngIf="!loadingUsers && filteredUsers.length === 0" class="text-gray-600 dark:text-gray-400">
@@ -208,6 +219,17 @@
       Next
     </button>
   </div>
+<div class="mb-4 flex justify-end">
+  <button
+    class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 disabled:opacity-50"
+    [disabled]="!hasSelectedUsers()"
+    (click)="openBulkRolesModal()"
+  >
+    Assign Roles to Selected Users
+  </button>
+</div>
+
+
 </div>
 
 <!-- User roles modal -->
@@ -218,3 +240,12 @@
   (close)="closeRolesModal()"
   (rolesUpdated)="onRolesUpdated()"
 ></app-user-roles-modal>
+
+
+<app-bulk-user-roles-modal
+  *ngIf="bulkRolesModalOpen && selectedRealm"
+  [realm]="selectedRealm"
+  [users]="selectedUsersForBulk"
+  (close)="closeBulkRolesModal()"
+  (rolesUpdated)="onRolesUpdated()"
+></app-bulk-user-roles-modal>

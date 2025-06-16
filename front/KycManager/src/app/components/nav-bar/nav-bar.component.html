@@ -1,40 +1,66 @@
-<mat-toolbar class="fixed top-0 w-full bg-white shadow-md z-50 px-3">
-       <!-- Logo -->
-      <a href="/" class="flex items-center ml-2 hover:cursor-pointer">
-        <img src="/assets/logoblack.png" alt="Logo" class="h-8 w-auto" />
-      </a>
-  <div class="flex justify-between items-center w-full max-w-screen-xl mx-auto">
+<nav class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="/" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+      <img src="/assets/logoblack.png" alt="Logo" class="h-9 w-auto" />
+      <span class="sr-only">Home</span>
+    </a>
 
-    <!-- Left side: Buttons + Logo -->
-    <div class="flex items-center space-x-6">
-      <!-- Buttons -->
-      <button mat-button class="text-teal-700 hover:bg-teal-100 font-semibold rounded-md px-3 py-1">
-        Users
-      </button>
-      <button mat-button class="text-teal-700 hover:bg-teal-100 font-semibold rounded-md px-3 py-1">
+    <div class="hidden md:flex space-x-4 font-medium">
+      <button
+        (click)="navigateToRealms()"
+        mat-button
+        class="text-teal-700 hover:bg-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded px-4 py-2 transition"
+        aria-label="Navigate to Realms"
+      >
         Realms
       </button>
-      <button mat-button class="text-teal-700 hover:bg-teal-100 font-semibold rounded-md px-3 py-1">
-        Clients
+
+      <button
+        (click)="logout()"
+        mat-button
+        class="flex items-center text-teal-700 hover:bg-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400 rounded px-4 py-2 transition space-x-1"
+        aria-label="Logout"
+      >
+        <mat-icon aria-hidden="true">logout</mat-icon>
+        <span>Logout</span>
       </button>
     </div>
 
-    <!-- Right side: Cercular Nav + Login / Logout -->
-    <div class="flex items-center space-x-4">
-      <app-cercularnav></app-cercularnav>
+    <!-- Mobile menu toggle button -->
+    <button
+      class="md:hidden text-teal-700 hover:bg-teal-100 rounded p-2 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
+      aria-label="Open menu"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
 
-      <div *ngIf="islogin;">
+  <!-- Mobile menu -->
+  <div
+    class="md:hidden bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+  >
+    <ul class="flex flex-col p-4 space-y-2 font-medium">
+      <li>
         <button
+          (click)="navigateToRealms(); "
           mat-button
-          class="flex items-center space-x-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-          (click)="logout()"
+          class="w-full text-teal-700 hover:bg-teal-100 rounded px-4 py-2 transition text-left"
+          aria-label="Navigate to Realms"
+        >
+          Realms
+        </button>
+      </li>
+      <li>
+        <button
+          (click)="logout(); "
+          mat-button
+          class="w-full flex items-center text-teal-700 hover:bg-teal-100 rounded px-4 py-2 transition space-x-1"
           aria-label="Logout"
         >
-          <mat-icon>logout</mat-icon>
+          <mat-icon aria-hidden="true">logout</mat-icon>
           <span>Logout</span>
         </button>
-      </div>
-    </div>
-
+      </li>
+    </ul>
   </div>
-</mat-toolbar>
+</nav>
