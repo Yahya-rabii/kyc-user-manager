@@ -7,6 +7,8 @@ import { UserRolesModalComponent } from './roles-modal/roles-modal.component';
 import { BulkUserRolesModalComponent } from './bulk-roles-modal/bulk-roles-modal.component';
 import { User } from '../../../../models/user.model';
 import { MatIconModule } from '@angular/material/icon';
+import { Role } from '../../../../models/role.model';
+import { UserWithRoles } from './bulk-roles-modal/bulk-roles-modal.component';
 
 
 @Component({
@@ -27,8 +29,8 @@ export class RealmstableComponent implements OnInit {
   bulkRolesModalOpen = false;
   // Selected realm and users
   selectedRealm: string | null = null;
-  users: User[] = [];
-  filteredUsers: User[] = [];
+  users: UserWithRoles[] = [];
+  filteredUsers: UserWithRoles[] = [];
   userSearchTerm: string = '';
   userPage: number = 1;
   userPageSize: number = 5;
@@ -36,7 +38,7 @@ export class RealmstableComponent implements OnInit {
   loadingUsers: boolean = false;
   usersError: string | null = null;
  // For role editing modal
-  editingUser: User | null = null;
+  editingUser: UserWithRoles| null = null;
 
   // Open bulk roles modal
   openBulkRolesModal() {
@@ -60,7 +62,7 @@ export class RealmstableComponent implements OnInit {
   }
 
   // Optionally update "select all" checkbox state or other logic
-  onUserSelectionChange(user: User) {
+  onUserSelectionChange(user: UserWithRoles) {
     // you can add logic here if needed, e.g. updating select all checkbox state
   }
 
@@ -69,7 +71,7 @@ export class RealmstableComponent implements OnInit {
     return this.filteredUsers.filter(u => u.selected);
   }
   // When user clicks edit button for roles
-  onEditUserRoles(user: User) {
+  onEditUserRoles(user: UserWithRoles) {
     this.editingUser = user;
   }
 
@@ -165,7 +167,7 @@ export class RealmstableComponent implements OnInit {
     this.userPage = 1;
   }
 
-  get paginatedUsers(): User[] {
+  get paginatedUsers(): UserWithRoles[] {
     const start = (this.userPage - 1) * this.userPageSize;
     return this.filteredUsers.slice(start, start + this.userPageSize);
   }

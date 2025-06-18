@@ -3,12 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppLogicService } from '../../../../../services/app.logic.service';
 
+interface Role {
+  id: string;
+  name: string;
+  type: string; // e.g., 'realm' or 'client:clientId'
+}
 
-interface UserWithRoles {
+export interface UserWithRoles {
   id: string;
   username: string;
   email?: string;
-  assignedRoles?: any[];
+  assignedRoles: Role[];
+  selected?: boolean;
 }
 
 @Component({
@@ -24,10 +30,8 @@ export class BulkUserRolesModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() rolesUpdated = new EventEmitter<void>();
 
-  availableRoles: any[] = [];
-  selectedRoles: any[] = [];
-  assignedRolesByUser: Map<string, any[]> = new Map();
-
+  availableRoles: Role[] = [];
+  // Instead of selectedRoles globally, we keep track of selected roles on all users
   selectedTypeFilter = '';
   roleSearchTerm = '';
   userSearchTerm = '';
@@ -53,11 +57,11 @@ export class BulkUserRolesModalComponent implements OnInit {
       const availableRaw = await this.appLogicService.getAvailableRoles(this.realm);
       this.availableRoles = this.normalizeAvailable(availableRaw);
 
+      // Load assigned roles per user
       for (const user of this.users) {
         const raw = await this.appLogicService.getUserRoles(this.realm, user.id);
         const roles = this.normalizeUser(raw);
-        this.assignedRolesByUser.set(user.id, roles);
-        user['assignedRoles'] = roles;
+        user.assignedRoles = roles;
       }
     } catch (e) {
       console.error(e);
@@ -67,91 +71,102 @@ export class BulkUserRolesModalComponent implements OnInit {
     }
   }
 
-  normalizeAvailable(raw: any): any[] {
-    const realmRoles = (raw.realmRoles || []).map((r: any) => ({ ...r, type: 'realm' }));
-    const clientRoles = Object.entries(raw.clientRoles || {}).flatMap(([client, roles]: [string, any]) =>
-      (roles as any[]).map(role => ({ ...role, type: `client:${client}` }))
+  normalizeAvailable(raw: any): Role[] {
+    const realmRoles: Role[] = (raw.realmRoles || []).map((r: any) => ({
+      ...r,
+      type: 'realm'
+    }));
+    const clientRoles: Role[] = Object.entries(raw.clientRoles || {}).flatMap(
+      ([client, roles]: [string, any]) =>
+        (roles as any[]).map(role => ({ ...role, type: `client:${client}` }))
     );
     return [...realmRoles, ...clientRoles];
   }
 
-  normalizeUser(raw: any): any[] {
-    const realm = (raw.realmMappings || []).map((r: any) => ({ ...r, type: 'realm' }));
-    const clients = Object.entries(raw.clientMappings || {}).flatMap(
-      ([client, data]: [string, any]) => data.mappings.map((r: any) => ({ ...r, type: `client:${client}` }))
+  normalizeUser(raw: any): Role[] {
+    const realm: Role[] = (raw.realmMappings || []).map((r: any) => ({
+      ...r,
+      type: 'realm'
+    }));
+    const clients: Role[] = Object.entries(raw.clientMappings || {}).flatMap(
+      ([client, data]: [string, any]) =>
+        data.mappings.map((r: any) => ({ ...r, type: `client:${client}` }))
     );
     return [...realm, ...clients];
   }
 
   getClientIds(): string[] {
-    return Array.from(new Set(this.availableRoles.filter(r => r.type.startsWith('client:')).map(r => r.type.split(':')[1])));
-  }
-
-  filteredAvailableRoles() {
-    return this.availableRoles.filter(role =>
-      (!this.selectedTypeFilter || role.type === this.selectedTypeFilter) &&
-      (!this.roleSearchTerm || role.name.toLowerCase().includes(this.roleSearchTerm.toLowerCase()))
+    return Array.from(
+      new Set(
+        this.availableRoles
+          .filter(r => r.type.startsWith('client:'))
+          .map(r => r.type.split(':')[1])
+      )
     );
   }
 
-  paginatedRoles() {
+  filteredAvailableRoles(): Role[] {
+    return this.availableRoles.filter(
+      role =>
+        (!this.selectedTypeFilter || role.type === this.selectedTypeFilter) &&
+        (!this.roleSearchTerm ||
+          role.name.toLowerCase().includes(this.roleSearchTerm.toLowerCase()))
+    );
+  }
+
+  paginatedRoles(): Role[] {
     const start = (this.currentPage - 1) * this.rolesPerPage;
     return this.filteredAvailableRoles().slice(start, start + this.rolesPerPage);
   }
 
-  totalPages() {
+  totalPages(): number {
     return Math.ceil(this.filteredAvailableRoles().length / this.rolesPerPage);
   }
 
-  filteredUsers() {
+  filteredUsers(): UserWithRoles[] {
     return this.users.filter(u =>
-      !this.userSearchTerm || u.username.toLowerCase().includes(this.userSearchTerm.toLowerCase())
+      !this.userSearchTerm ||
+      u.username.toLowerCase().includes(this.userSearchTerm.toLowerCase())
     );
   }
 
-  paginatedUsers() {
+  paginatedUsers(): UserWithRoles[] {
     const start = (this.userPage - 1) * this.usersPerPage;
     return this.filteredUsers().slice(start, start + this.usersPerPage);
   }
 
-  totalUserPages() {
+  totalUserPages(): number {
     return Math.ceil(this.filteredUsers().length / this.usersPerPage);
   }
 
-  isRoleSelected(role: any): boolean {
-    return this.selectedRoles.some(r => r.name === role.name && r.type === role.type);
+  /** Checks if this role is selected by ALL users (bulk selection) */
+  isBulkRoleSelected(role: Role): boolean {
+    // If every user has this role assigned, then role is selected bulk
+    return this.users.every(user =>
+      user.assignedRoles.some(r => r.name === role.name && r.type === role.type)
+    );
   }
 
-  toggleSelectRole(role: any) {
-    if (this.isRoleSelected(role)) {
-      this.selectedRoles = this.selectedRoles.filter(r => !(r.name === role.name && r.type === role.type));
-    } else {
-      this.selectedRoles.push(role);
-    }
-  }
-
-  sanitizeRoles(roles: any[]): any[] {
-    return roles.map(role => ({ id: role.id, name: role.name, type: role.type }));
-  }
-
-  async submitSelectedRoles() {
+  /** Toggle role for ALL users at once */
+  async toggleBulkRole(role: Role) {
     this.processing = true;
     this.error = null;
     try {
-      for (const user of this.users) {
-        const currentRoles = this.assignedRolesByUser.get(user.id) || [];
-        const rolesToAdd = this.selectedRoles.filter(r => !currentRoles.some(cr => cr.name === r.name && cr.type === r.type));
-        const rolesToRemove = currentRoles.filter(r => !this.selectedRoles.some(sr => sr.name === r.name && sr.type === r.type));
-
-        if (rolesToRemove.length) {
-          await this.appLogicService.removeRolesFromUser(this.realm, user.id, this.sanitizeRoles(rolesToRemove));
-        }
-        if (rolesToAdd.length) {
-          await this.appLogicService.addRolesToUser(this.realm, user.id, this.sanitizeRoles(rolesToAdd));
-        }
+      if (this.isBulkRoleSelected(role)) {
+        // Remove role from ALL users
+        await Promise.all(
+          this.users.map(user =>
+            this.removeRoleFromUser(user, role, true /*silent*/)
+          )
+        );
+      } else {
+        // Add role to ALL users
+        await Promise.all(
+          this.users.map(user =>
+            this.addRoleToUser(user, role, true /*silent*/)
+          )
+        );
       }
-      await this.loadAll();
-      this.rolesUpdated.emit();
     } catch (e) {
       console.error(e);
       this.error = 'Failed to update roles.';
@@ -160,7 +175,74 @@ export class BulkUserRolesModalComponent implements OnInit {
     }
   }
 
+  /** Remove a role from a single user with optional silent flag to avoid multiple reloads */
+  async removeRoleFromUser(user: UserWithRoles, role: Role, silent = false) {
+    if (!user.assignedRoles.find(r => r.name === role.name && r.type === role.type)) {
+      return; // role not assigned
+    }
+
+    if (!silent) this.processing = true;
+    this.error = null;
+
+    try {
+      await this.appLogicService.removeRolesFromUser(this.realm, user.id, [
+        this.sanitizeRole(role)
+      ]);
+      // Update UI
+      user.assignedRoles = user.assignedRoles.filter(
+        r => !(r.name === role.name && r.type === role.type)
+      );
+      if (!silent) this.rolesUpdated.emit();
+    } catch (e) {
+      console.error(e);
+      this.error = 'Failed to remove role from user.';
+    } finally {
+      if (!silent) this.processing = false;
+    }
+  }
+
+  /** Add a role to a single user */
+  async addRoleToUser(user: UserWithRoles, role: Role, silent = false) {
+    if (user.assignedRoles.find(r => r.name === role.name && r.type === role.type)) {
+      return; // already assigned
+    }
+
+    if (!silent) this.processing = true;
+    this.error = null;
+
+    try {
+      await this.appLogicService.addRolesToUser(this.realm, user.id, [
+        this.sanitizeRole(role)
+      ]);
+      user.assignedRoles.push(role);
+      if (!silent) this.rolesUpdated.emit();
+    } catch (e) {
+      console.error(e);
+      this.error = 'Failed to add role to user.';
+    } finally {
+      if (!silent) this.processing = false;
+    }
+  }
+
+  sanitizeRole(role: Role) {
+    return { id: role.id, name: role.name, type: role.type };
+  }
+
+  onRoleSearchTermChange() {
+    this.currentPage = 1;
+  }
+
+  onUserSearchTermChange() {
+    this.userPage = 1;
+  }
+
+  onRoleFilterChange() {
+    this.currentPage = 1;
+  }
+
   onClose() {
     this.close.emit();
   }
+
+
 }
