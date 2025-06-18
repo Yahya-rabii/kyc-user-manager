@@ -1,3 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5dcf5f81-479a-4ad8-9245-0b97c5b19a2f" alt="fposter_medium_wall_texture_product" />
+
+![logoblack-removebg-preview](https://github.com/user-attachments/assets/78aeaae2-3ba7-4262-b2a2-1f8c23892a92)
+
 </p>
