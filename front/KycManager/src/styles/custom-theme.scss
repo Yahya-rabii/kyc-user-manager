@@ -1,29 +1,40 @@
 @use "@angular/material" as mat;
+
 @include mat.core();
+
 html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  --primary-color: #cc0000;
+  /* Optional CSS variable override */
+  --primary-color: #1e40af; /* Tailwind blue-900 */
 }
+
+// Define your primary blue palette based on Tailwind blues
 $mat-primary: (
-  main: #cc0000,
-  lighter: #f0b3b3,
-  darker: #990000,
-  200: #cc0000,
-  //for slide toggle
-  contrast:
-    (
-      main: #ffffff,
-      lighter: #000000,
-      darker: #ffffff,
-    ),
+  main: #3b82f6,   // Tailwind blue-500
+  lighter: #60a5fa, // Tailwind blue-400
+  darker: #1e40af,  // Tailwind blue-900
+  200: #93c5fd,    // Tailwind blue-300
+  // For slide toggle contrast colors
+  contrast: (
+    main: #ffffff,
+    lighter: #000000,
+    darker: #ffffff,
+  ),
 );
-$theme-primary: mat.m2-define-palette($mat-primary, main, lighter, darker);
+
+// Use Material's Indigo palette for accent (or change if you want)
 $theme-accent: mat.m2-define-palette(mat.$m2-indigo-palette, A200, A100, A400);
+
+// Define the primary palette with your colors
+$theme-primary: mat.m2-define-palette($mat-primary, main, lighter, darker);
+
+// Define your Material light theme
 $my-theme: mat.m2-define-light-theme(
   (
     color: (
@@ -34,4 +45,5 @@ $my-theme: mat.m2-define-light-theme(
     density: 0,
   )
 );
+
 @include mat.all-component-themes($my-theme);

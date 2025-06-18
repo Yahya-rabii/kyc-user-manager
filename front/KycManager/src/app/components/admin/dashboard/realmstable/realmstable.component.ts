@@ -6,11 +6,13 @@ import { AppLogicService } from '../../../../services/app.logic.service';
 import { UserRolesModalComponent } from './roles-modal/roles-modal.component';
 import { BulkUserRolesModalComponent } from './bulk-roles-modal/bulk-roles-modal.component';
 import { User } from '../../../../models/user.model';
+import { MatIconModule } from '@angular/material/icon';
+
 
 @Component({
   selector: 'app-realmstable',
   standalone: true,
-  imports: [CommonModule, FormsModule , UserRolesModalComponent , BulkUserRolesModalComponent],
+  imports: [CommonModule, FormsModule , UserRolesModalComponent , BulkUserRolesModalComponent , MatIconModule],
   templateUrl: './realmstable.component.html',
   styleUrls: ['./realmstable.component.css'],
 })

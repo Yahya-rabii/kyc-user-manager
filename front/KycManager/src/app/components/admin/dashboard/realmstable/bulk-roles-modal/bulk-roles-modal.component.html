@@ -1,133 +1,115 @@
-<!-- bulk-user-roles-modal.component.html -->
-<div class="modal-backdrop fullscreen">
-  <div class="modal-content fullscreen-container flex flex-col">
+<div class="modal-backdrop fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="modal-content bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col border border-gray-200 dark:border-gray-700 overflow-hidden">
 
-    <div class="modal-header flex justify-between items-center p-4 border-b">
-      <h2 class="text-2xl font-bold">Bulk Manage Roles</h2>
-      <button class="close-btn text-2xl" (click)="onClose()">✕</button>
+    <!-- Header -->
+    <div class="modal-header flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+        <span class="material-icons text-blue-600 dark:text-blue-400">group</span>
+        Bulk Role Management - Realm: <span class="font-bold">{{ realm }}</span>
+      </h2>
+      <button class="text-2xl text-gray-500 hover:text-red-600 transition" (click)="onClose()">
+        <span class="material-icons">close</span>
+      </button>
     </div>
 
-    <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-
-      <!-- Users Section -->
-      <section class="flex flex-col w-full md:w-1/2 border-r overflow-hidden">
-        <div class="p-4 flex flex-col gap-2">
-          <h3 class="text-lg font-semibold">Users</h3>
-          <input
-            type="text"
-            placeholder="Search users"
-            [(ngModel)]="userSearchTerm"
-            class="p-2 border rounded"
-          />
-        </div>
-
-        <div class="overflow-y-auto flex-1 p-4">
-          <div
-            *ngFor="let user of paginatedFilteredUsers()"
-            (click)="toggleSelectUser(user)"
-            [class.bg-blue-200]="isUserSelected(user)"
-            class="cursor-pointer border p-3 rounded mb-2 hover:bg-blue-100"
-          >
-            {{ user.username }} (ID: {{ user.id }})
-          </div>
-        </div>
-
-        <div class="p-4 flex justify-center gap-2 border-t">
-          <button
-            class="px-3 py-1 rounded border"
-            (click)="changeUserPage(currentUserPage - 1)"
-            [disabled]="currentUserPage === 1"
-          >
-            Previous
-          </button>
-          <span>Page {{ currentUserPage }} of {{ totalUserPages() }}</span>
-          <button
-            class="px-3 py-1 rounded border"
-            (click)="changeUserPage(currentUserPage + 1)"
-            [disabled]="currentUserPage === totalUserPages()"
-          >
-            Next
-          </button>
-        </div>
-      </section>
-
-      <!-- Roles Section -->
-      <section class="flex flex-col w-full md:w-1/2 overflow-hidden">
-        <div class="p-4 flex flex-col gap-2">
-          <h3 class="text-lg font-semibold">Roles</h3>
-
-          <div class="flex flex-wrap gap-4">
-            <select [(ngModel)]="selectedTypeFilter" class="p-2 border rounded">
-              <option value="">All</option>
-              <option value="realm">Realm Roles</option>
-              <option
-                *ngFor="let client of getClientIds()"
-                [value]="'client:' + client"
-              >
-                Client: {{ client }}
-              </option>
-            </select>
-
-            <input
-              type="text"
-              placeholder="Search roles"
-              [(ngModel)]="roleSearchTerm"
-              class="p-2 border rounded flex-1"
-            />
-          </div>
-        </div>
-
-        <div class="overflow-y-auto flex-1 p-4">
-          <div
-            *ngFor="let role of paginatedRoles()"
-            (click)="toggleSelectRole(role)"
-            [class.bg-green-200]="isRoleSelected(role)"
-            class="cursor-pointer border p-3 rounded mb-2 hover:bg-green-100"
-          >
-            {{ role.name }} <br />
-            <small class="text-xs text-gray-500">({{ role.type }})</small>
-          </div>
-        </div>
-
-        <div class="p-4 flex justify-center gap-2 border-t">
-          <button
-            class="px-3 py-1 rounded border"
-            (click)="changeRolePage(currentRolePage - 1)"
-            [disabled]="currentRolePage === 1"
-          >
-            Previous
-          </button>
-          <span>Page {{ currentRolePage }} of {{ totalRolePages() }}</span>
-          <button
-            class="px-3 py-1 rounded border"
-            (click)="changeRolePage(currentRolePage + 1)"
-            [disabled]="currentRolePage === totalRolePages()"
-          >
-            Next
-          </button>
-        </div>
-      </section>
-    </div>
-
-    <div class="p-4 border-t flex justify-between items-center">
-      <div *ngIf="error" class="text-red-600 font-semibold">{{ error }}</div>
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 px-6 py-4 items-center bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
       <div>
-        <button
-          class="bg-green-600 text-white px-5 py-2 rounded mr-4 disabled:opacity-50"
-          (click)="bulkAddRoles()"
-          [disabled]="processing || selectedUsers.length === 0 || selectedRoles.length === 0"
-        >
-          Add Roles to Selected Users
-        </button>
-        <button
-          class="bg-red-600 text-white px-5 py-2 rounded disabled:opacity-50"
-          (click)="bulkRemoveRoles()"
-          [disabled]="processing || selectedUsers.length === 0 || selectedRoles.length === 0"
-        >
-          Remove Roles from Selected Users
-        </button>
+        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Role Type</label>
+        <select [(ngModel)]="selectedTypeFilter" class="p-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+          <option value="">All</option>
+          <option value="realm">Realm Roles</option>
+          <option *ngFor="let client of getClientIds()" [value]="'client:' + client">
+            Client: {{ client }}
+          </option>
+        </select>
+      </div>
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Search Roles</label>
+        <input
+          type="text"
+          placeholder="Search available roles"
+          [(ngModel)]="roleSearchTerm"
+          class="p-2 border border-gray-300 dark:border-gray-700 rounded w-full bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+        />
       </div>
     </div>
 
+    <!-- Available Roles -->
+    <div class="section-title px-6 pt-6 pb-2 text-lg font-semibold text-gray-700 dark:text-gray-200">Available Roles</div>
+    <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 px-6 pb-4 overflow-y-auto">
+      <div
+        *ngFor="let role of paginatedRoles()"
+        (click)="toggleSelectRole(role)"
+        [class.bg-blue-100]="isRoleSelected(role)"
+        class="cursor-pointer border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-sm hover:bg-blue-50 dark:hover:bg-blue-900 transition relative group"
+      >
+        <div class="flex items-center gap-2">
+          <span class="material-icons text-blue-600 dark:text-blue-400 text-lg">vpn_key</span>
+          <span class="font-medium text-gray-800 dark:text-gray-100">{{ role.name }}</span>
+        </div>
+        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">({{ role.type }})</div>
+        <span *ngIf="isRoleSelected(role)" class="material-icons absolute top-2 right-2 text-green-600 dark:text-green-400 text-xl">check_circle</span>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center gap-4 px-6 py-2 bg-gray-50 dark:bg-gray-800 border-t border-b border-gray-200 dark:border-gray-700">
+      <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1" class="px-4 py-1 rounded border bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">Previous</button>
+      <span class="text-gray-700 dark:text-gray-200">Page {{ currentPage }} of {{ totalPages() }}</span>
+      <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages()" class="px-4 py-1 rounded border bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">Next</button>
+    </div>
+
+    <!-- Assigned Roles Overview Table -->
+    <div class="px-6 pt-6 pb-2 text-lg font-semibold text-gray-700 dark:text-gray-200">Assigned Roles per Selected User</div>
+    <div class="px-6 pb-4">
+      <input
+        type="text"
+        [(ngModel)]="userSearchTerm"
+        placeholder="Search user by username"
+        class="mb-4 p-2 w-full border rounded bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+      />
+      <table class="min-w-full text-left text-sm">
+        <thead>
+          <tr class="text-xs uppercase text-gray-500 dark:text-gray-400 border-b">
+            <th class="py-2">Username</th>
+            <th class="py-2">Email</th>
+            <th class="py-2">Roles</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of paginatedUsers()">
+            <td class="py-2 font-medium text-gray-800 dark:text-gray-100">{{ user.username }}</td>
+            <td class="py-2 text-gray-600 dark:text-gray-300">{{ user.email }}</td>
+            <td class="py-2">
+              <span
+                *ngFor="let role of user.assignedRoles"
+                class="inline-block bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 text-xs font-medium mr-1 mb-1 px-2 py-1 rounded"
+              >
+                {{ role.name }} ({{ role.type }})
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Pagination -->
+      <div class="flex justify-center mt-4">
+        <button (click)="userPage = userPage - 1" [disabled]="userPage === 1" class="px-4 py-1 border rounded">Previous</button>
+        <span class="px-4 py-1 text-gray-700 dark:text-gray-300">Page {{ userPage }} of {{ totalUserPages() }}</span>
+        <button (click)="userPage = userPage + 1" [disabled]="userPage === totalUserPages()" class="px-4 py-1 border rounded">Next</button>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex justify-end px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <button
+        (click)="submitSelectedRoles()"
+        [disabled]="processing"
+        class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-8 py-2 rounded shadow font-semibold transition"
+      >
+        <span *ngIf="processing" class="material-icons animate-spin align-middle mr-2">autorenew</span>
+        Submit Changes
+      </button>
+    </div>
   </div>
 </div>

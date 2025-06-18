@@ -18,6 +18,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
 
-  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: '/kyc/realms' },
+
 
 ];

@@ -1,69 +1,76 @@
-<section class="dark:bg-gray-900">
-  <div
-    class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 sm:mt-5"
-  >
-    <a
-      href="#"
-      class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
-    >
-      <img class="w-8 h-8 mr-2" src="assets/logosg.png" alt="logo" />
-      <span class="text-2xl font-semibold text-primary-500">
-        Welcome To
-        <span class="text-2xl font-semibold text-red-700">KYC-MANAGER</span></span
-      >
-    </a>
-    <div
-      class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700"
-    >
-      <form
-        [formGroup]="loginForm"
-        (ngSubmit)="Submit()"
-        class="p-6 space-y-4 md:space-y-6 sm:p-8 shadow-lg"
-      >
-        <h1
-          class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
-        >
-          Login to your account
-        </h1>
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-blue-900 via-gray-900 to-blue-500">
+  <!-- Background SVG Wave -->
+  <svg class="absolute bottom-0 left-0 w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+    <path fill="#fff" fill-opacity="1"
+      d="M0,0L40,42.7C80,85,160,171,240,197.3C320,224,400,192,480,154.7C560,117,640,75,720,74.7C800,75,880,117,960,154.7C1040,192,1120,224,1200,213.3C1280,203,1360,149,1400,122.7L1440,96L1440,320L0,320Z">
+    </path>
+  </svg>
+
+  <div class="z-10 sm:flex sm:flex-row items-center justify-center px-6 py-8">
+    <!-- Welcome Text -->
+    <div class="hidden lg:flex flex-col text-white max-w-md pr-10">
+      <h1 class="text-4xl font-bold mb-3">Welcome back</h1>
+      <p class="text-sm opacity-75">
+        Manage your users, roles, and access permissions efficiently using <strong>KYC-MANAGER</strong>.
+      </p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="bg-white rounded-3xl shadow-xl p-8 w-96">
+      <div class="mb-7 text-center">
+        <img src="/assets/logoblack.png" alt="KYC-MANAGER Logo" class="h-12 mx-auto mb-4">
+      </div>
+      <form [formGroup]="loginForm" (ngSubmit)="Submit()" class="space-y-6">
+        <!-- Username -->
         <div>
-          <label
-            for="username"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Username</label
-          >
-          <input
-            type="username"
-            formControlName="username"
-            id="username"
-            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="username"
-            required
-          />
+          <input type="text" formControlName="username"
+            class="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+            placeholder="Username" required />
         </div>
+
+        <!-- Password -->
+        <div class="relative">
+          <input
+            [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Password"
+            class="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400"
+            required />
+          <!-- Eye Icon -->
+            <div
+            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+            (click)="showPassword = !showPassword"
+            tabindex="0"
+            (keydown.enter)="showPassword = !showPassword"
+            (keydown.space)="showPassword = !showPassword"
+            aria-label="Toggle password visibility"
+            >
+            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95M6.7 6.7A9.953 9.953 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.965 9.965 0 01-4.293 5.95M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3l18 18" />
+            </svg>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
         <div>
-          <label
-            for="password"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Password</label
-          >
-          <input
-            type="password"
-            formControlName="password"
-            id="password"
-            placeholder="••••••••"
-            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
-          />
+          <button type="submit"
+            class="w-full flex justify-center bg-blue-800 hover:bg-blue-700 text-white p-3 rounded-lg tracking-wide font-semibold transition duration-500">
+            Sign in
+          </button>
         </div>
-        <button
-          type="submit"
-          class="w-full border-2 border-red-600 hover:border-gray-50 text-red-700 bg-primary-600 hover:text-red-100 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700"
-        >
-          Login
-        </button>
       </form>
+
       <!-- Loading Spinner -->
-      <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+      <div class="mt-4 text-center">
+        <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+      </div>
     </div>
   </div>
 </section>

@@ -15,7 +15,7 @@ export class NoAuthGuard implements CanActivate {
     try {
       const isLoggedIn = await this.authService.isLoggedIn();
       if (isLoggedIn) {
-        this.router.navigate(['/admin/dashboard']).then();
+        this.router.navigate(['/kyc/realms']).then();
         return true;
       }
       return true;

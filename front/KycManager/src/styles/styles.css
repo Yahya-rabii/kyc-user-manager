@@ -10,3 +10,6 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+.spinner .mat-progress-spinner circle {
+  stroke: #3b82f6 !important; /* Tailwind blue-500 */
+}

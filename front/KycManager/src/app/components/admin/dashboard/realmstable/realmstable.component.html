@@ -1,60 +1,49 @@
 <!-- Realms container -->
-<div class="relative shadow-md rounded-lg bg-white dark:bg-gray-800 w-full my-4 mt-28">
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-0">Realms List</h3>
-    <div class="relative w-full sm:w-64">
+<div class="relative shadow-sm rounded-lg bg-white dark:bg-gray-900 w-full my-4 mt-28 border border-gray-200 dark:border-gray-800">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 rounded-t">
+    <h3 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight mb-3 sm:mb-0">Realms</h3>
+    <div class="relative w-full sm:w-72">
       <input
         type="text"
-        placeholder="Search Realms by name..."
+        placeholder="Search realms"
         [(ngModel)]="searchTerm"
         (input)="applyFilter()"
-        class="block w-full pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-400 dark:focus:border-teal-400"
+        class="block w-full pl-10 pr-3 py-2 text-base text-gray-900 placeholder-gray-400 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-400 dark:focus:border-blue-400"
       />
       <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <svg
-          class="w-5 h-5 text-gray-400 dark:text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
+        <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
       </div>
     </div>
   </div>
 
-  <div class="p-6 w-full">
+  <div class="p-8 w-full">
     <ng-container *ngIf="filteredRealms.length === 0">
-      <h1 class="text-2xl font-semibold text-gray-600 dark:text-gray-400 text-center mt-6 animate-bounce">
-        No Realms Found
-      </h1>
+      <div class="flex flex-col items-center justify-center py-12">
+        <svg class="w-16 h-16 text-gray-300 dark:text-gray-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9l6 6m0-6l-6 6"></path>
+        </svg>
+        <h1 class="text-xl font-semibold text-gray-500 dark:text-gray-400 text-center">No Realms Found</h1>
+      </div>
     </ng-container>
 
     <ng-container *ngIf="filteredRealms.length > 0">
       <div class="w-full mx-auto">
-        <div
-          class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"
-          style="width: 100%;"
-        >
+        <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
           <div
             *ngFor="let realm of paginatedRealms"
             (click)="onRealmClick(realm)"
             tabindex="0"
             role="button"
             [attr.aria-label]="'Realm ' + realm"
-            class="cursor-pointer rounded-lg shadow hover:bg-teal-100 transition p-4 flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-teal-500"
+            class="cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 transition p-5 flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 group"
           >
-            <img
-              src="/assets/logo.png"
-              alt="realm image"
-              class="w-16 h-16 rounded-full mb-2"
-            />
-            <p
-              class="text-center font-semibold text-gray-900 dark:text-gray-100 truncate w-full"
-              title="{{ realm }}"
-            >
+            <div class="flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-3 shadow group-hover:bg-blue-100 dark:group-hover:bg-blue-800 transition">
+                <mat-icon class="w-10 h-10 object-contain" aria-hidden="true">account_balance</mat-icon>
+            </div>
+            <p class="text-center font-semibold text-gray-900 dark:text-gray-100 truncate w-full" title="{{ realm }}">
               {{ realm }}
             </p>
           </div>
@@ -62,174 +51,156 @@
       </div>
 
       <!-- Realms Pagination -->
-      <div class="flex justify-center mt-6 space-x-2 select-none">
+      <div class="flex justify-center mt-8 space-x-2 select-none">
         <button
           (click)="goToPage(page - 1)"
           [disabled]="page === 1"
-          class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+          class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
         >
           Prev
         </button>
-
         <button
           *ngFor="let _ of [].constructor(totalPages()); let i = index"
           (click)="goToPage(i + 1)"
           [class.font-bold]="page === i + 1"
-          class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
-          [class.bg-teal-200]="page === i + 1"
-          [class.dark:bg-teal-600]="page === i + 1"
+          class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+          [class.bg-blue-100]="page === i + 1"
+          [class.dark:bg-blue-700]="page === i + 1"
         >
           {{ i + 1 }}
         </button>
-
         <button
           (click)="goToPage(page + 1)"
           [disabled]="page === totalPages()"
-          class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+          class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
         >
           Next
         </button>
       </div>
     </ng-container>
   </div>
-
-
-
-
-
-
-
+</div>
 
 <!-- Users table: shows only if a realm is selected -->
-<div *ngIf="selectedRealm" class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8 border border-gray-300 dark:border-gray-600 rounded-lg p-6 bg-white dark:bg-gray-800">
-  <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Users in realm: {{ selectedRealm }}</h2>
-
-  <!-- User search input aligned right like realms -->
-  <div class="relative w-64 ml-auto mb-4">
-    <input
-      type="text"
-      placeholder="Search users by username..."
-      [(ngModel)]="userSearchTerm"
-      (input)="applyUserFilter()"
-      class="block w-full pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-400 dark:focus:border-teal-400"
-    />
-    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-      <svg
-        class="w-5 h-5 text-gray-400 dark:text-gray-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
+<div *ngIf="selectedRealm" class="relative overflow-x-auto shadow-sm rounded-lg border border-gray-200 dark:border-gray-800 mt-10 p-8 bg-white dark:bg-gray-900">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">
+      Users in realm: <span class="text-blue-600 dark:text-blue-400">{{ selectedRealm }}</span>
+    </h2>
+    <div class="relative w-full sm:w-72 mt-4 sm:mt-0">
+      <input
+        type="text"
+        placeholder="Search users"
+        [(ngModel)]="userSearchTerm"
+        (input)="applyUserFilter()"
+        class="block w-full pl-10 pr-3 py-2 text-base text-gray-900 placeholder-gray-400 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-400 dark:focus:border-blue-400"
+      />
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
     </div>
   </div>
 
   <div *ngIf="loadingUsers" class="mb-4 text-gray-700 dark:text-gray-300">Loading users...</div>
   <div *ngIf="usersError" class="mb-4 text-red-600">{{ usersError }}</div>
 
-  <table *ngIf="!loadingUsers && filteredUsers.length > 0" class="w-full text-sm text-left text-gray-700 dark:text-gray-300 border-collapse">
-    <thead>
-  <tr>
-    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">
-      <input type="checkbox" (change)="toggleSelectAll($event)" [checked]="allUsersSelected()" aria-label="Select all users" />
-    </th>
-    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Username</th>
-    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600">Email</th>
-    <th scope="col" class="px-6 py-3 border-b border-gray-300 dark:border-gray-600 text-center">Action</th>
-  </tr>
-</thead>
-
-<tbody>
-  <tr
-    *ngFor="let user of paginatedUsers"
-    class="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-  >
-    <td class="px-6 py-4 text-center">
-      <input
-        type="checkbox"
-        [(ngModel)]="user.selected"
-        (change)="onUserSelectionChange(user)"
-        [attr.aria-label]="'Select user ' + user.username"
-      />
-    </td>
-    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-      {{ user.username }}
-    </th>
-    <td class="px-6 py-4">
-      {{ user.email || '-' }}
-    </td>
-    <td class="px-6 py-4 text-center">
-      <!-- Ellipsis '...' button with styling -->
-      <button
-        type="button"
-        aria-label="Edit user"
-        class="relative inline-flex items-center justify-center w-8 h-8 rounded-full ..."
-        (click)="onEditUserRoles(user)"
+  <table *ngIf="!loadingUsers && filteredUsers.length > 0" class="w-full text-base text-left text-gray-700 dark:text-gray-300 border-collapse rounded-lg overflow-hidden">
+    <thead class="bg-gray-50 dark:bg-gray-800">
+      <tr>
+        <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 w-12">
+          <input type="checkbox" (change)="toggleSelectAll($event)" [checked]="allUsersSelected()" aria-label="Select all users" />
+        </th>
+        <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">Username</th>
+        <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">Email</th>
+        <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let user of paginatedUsers"
+        class="bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900 transition"
       >
-        <svg
-          class="w-5 h-5"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <circle cx="6" cy="10" r="2" />
-          <circle cx="10" cy="10" r="2" />
-          <circle cx="14" cy="10" r="2" />
-        </svg>
-      </button>
-    </td>
-  </tr>
-</tbody>
+        <td class="px-4 py-3 text-center">
+          <input
+            type="checkbox"
+            [(ngModel)]="user.selected"
+            (change)="onUserSelectionChange(user)"
+            [attr.aria-label]="'Select user ' + user.username"
+          />
+        </td>
+        <th class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          {{ user.username }}
+        </th>
+        <td class="px-4 py-3">
+          {{ user.email || '-' }}
+        </td>
+        <td class="px-4 py-3 text-center">
+          <button
+            type="button"
+            aria-label="Edit user"
+            class="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800 transition"
+            (click)="onEditUserRoles(user)"
+          >
+            <svg class="w-5 h-5 text-gray-500 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+              <circle cx="6" cy="10" r="2" />
+              <circle cx="10" cy="10" r="2" />
+              <circle cx="14" cy="10" r="2" />
+            </svg>
+          </button>
+        </td>
+      </tr>
+    </tbody>
   </table>
 
-  <div *ngIf="!loadingUsers && filteredUsers.length === 0" class="text-gray-600 dark:text-gray-400">
-    No users found in this realm.
+  <div *ngIf="!loadingUsers && filteredUsers.length === 0" class="flex flex-col items-center justify-center py-12">
+    <svg class="w-16 h-16 text-gray-300 dark:text-gray-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9l6 6m0-6l-6 6"></path>
+    </svg>
+    <div class="text-lg text-gray-500 dark:text-gray-400">No users found in this realm.</div>
   </div>
 
   <!-- Users Pagination -->
-  <div *ngIf="filteredUsers.length > 0" class="flex justify-center mt-6 space-x-2 select-none">
-    <button
-      (click)="goToUserPage(userPage - 1)"
-      [disabled]="userPage === 1"
-      class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
-    >
-      Prev
-    </button>
-
-    <button
-      *ngFor="let _ of [].constructor(totalUserPages()); let i = index"
-      (click)="goToUserPage(i + 1)"
-      [class.font-bold]="userPage === i + 1"
-      class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
-      [class.bg-teal-200]="userPage === i + 1"
-      [class.dark:bg-teal-600]="userPage === i + 1"
-    >
-      {{ i + 1 }}
-    </button>
-
-    <button
-      (click)="goToUserPage(userPage + 1)"
-      [disabled]="userPage === totalUserPages()"
-      class="px-4 py-2 rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
-    >
-      Next
-    </button>
+  <div *ngIf="filteredUsers.length > 0" class="flex justify-between items-center mt-8">
+    <div></div>
+    <div class="flex space-x-2">
+      <button
+        (click)="goToUserPage(userPage - 1)"
+        [disabled]="userPage === 1"
+        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+      >
+        Prev
+      </button>
+      <button
+        *ngFor="let _ of [].constructor(totalUserPages()); let i = index"
+        (click)="goToUserPage(i + 1)"
+        [class.font-bold]="userPage === i + 1"
+        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+        [class.bg-blue-100]="userPage === i + 1"
+        [class.dark:bg-blue-700]="userPage === i + 1"
+      >
+        {{ i + 1 }}
+      </button>
+      <button
+        (click)="goToUserPage(userPage + 1)"
+        [disabled]="userPage === totalUserPages()"
+        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+      >
+        Next
+      </button>
+    </div>
+    <div>
+      <button
+        class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+        [disabled]="!hasSelectedUsers()"
+        (click)="openBulkRolesModal()"
+      >
+        Assign Roles to Selected
+      </button>
+    </div>
   </div>
-<div class="mb-4 flex justify-end">
-  <button
-    class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 disabled:opacity-50"
-    [disabled]="!hasSelectedUsers()"
-    (click)="openBulkRolesModal()"
-  >
-    Assign Roles to Selected Users
-  </button>
-</div>
-
-
 </div>
 
 <!-- User roles modal -->
@@ -240,7 +211,6 @@
   (close)="closeRolesModal()"
   (rolesUpdated)="onRolesUpdated()"
 ></app-user-roles-modal>
-
 
 <app-bulk-user-roles-modal
   *ngIf="bulkRolesModalOpen && selectedRealm"
