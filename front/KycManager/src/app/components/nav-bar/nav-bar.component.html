@@ -1,67 +1,46 @@
-<nav class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-  
-  <div class="max-w-screen-xl mx-auto px-4 py-3 flex ">
-
-    <img src="/assets/Sahamlogoblack.png" alt="Saham Logo"class="absolute right-5 h-12 w-auto z-20" />
-    <img src="/assets/logoblack.png" alt="Logo" class="absolute left-5 h-12 w-auto z-20" />
-    
-
-    <!-- Desktop Menu -->
-    <div class="hidden md:flex space-x-4 font-medium">
+<nav
+  class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow sticky top-0 z-50 transition-all duration-300"
+>
+  <div class="w-full flex items-center justify-between px-6 py-3">
+    <!-- Left Logo & Realms Button -->
+    <div class="flex items-center gap-6">
+      <img
+        src="/assets/logoblack.png"
+        alt="Logo"
+        class="h-12 w-auto drop-shadow-md transition-transform duration-300 hover:scale-105 cursor-pointer"
+      />
       <button
         (click)="navigateToRealms()"
-        mat-button
-        class="text-blue-800 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-4 py-2 transition"
         aria-label="Navigate to Realms"
+        class="flex items-center gap-2 rounded-md
+               px-3 py-2 text-blue-700 font-semibold
+               transition-transform duration-300
+               hover:brightness-110 hover:scale-105  "
       >
-        Realms
-      </button>
-
-      <button
-        (click)="logout()"
-        mat-button
-        class="flex items-center text-blue-800 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-4 py-2 transition space-x-1"
-        aria-label="Logout"
-      >
-        <mat-icon aria-hidden="true">logout</mat-icon>
-        <span>Logout</span>
+        <mat-icon class="text-lg leading-none ">public</mat-icon>
+        <span>Realms</span>
       </button>
     </div>
 
-    <!-- Mobile menu toggle button -->
-    <button
-      class="md:hidden text-blue-800 hover:bg-blue-100 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-      aria-label="Open menu"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
-  </div>
-
-  <!-- Mobile menu -->
-  <div
-    class="md:hidden bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
-  >
-    <ul class="flex flex-col p-4 space-y-2 font-medium">
-      <li>
-        <button
-          (click)="navigateToRealms(); "
-          mat-button
-          class="w-full text-blue-800 hover:bg-blue-100 rounded px-4 py-2 transition text-left"
-          aria-label="Navigate to Realms"
-        >
-          Realms
-        </button>
-      </li>
-      <li>
-         <button
-          (click)="logout()"
-          mat-button
-          class="right-0 w-full flex items-center gap-2 text-gray-800 dark:text-gray-100 hover:bg-red-100 dark:hover:bg-red-800 px-4 py-2 rounded transition-all duration-200"
-        >
-          <mat-icon aria-hidden="true">logout</mat-icon>
-          <span>Logout</span>
-        </button>
-      </li>
-    </ul>
+    <!-- Logout Button & Right Logo -->
+    <div class="flex items-center gap-6">
+      <button
+        (click)="logout()"
+        aria-label="Logout"
+        class="flex items-center gap-2 rounded-md bg-gradient-to-r from-red-600 to-red-500
+               px-2 py-2 text-white font-semibold shadow-md
+               transition-transform duration-300
+               hover:brightness-110 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400"
+      >
+        <mat-icon class="text-lg leading-none text-cyan-50
+                     hover:text-white transition-colors duration-300"
+        aria-hidden="true">logout</mat-icon>
+      </button>
+      <img
+        src="/assets/Sahamlogoblack.png"
+        alt="Saham Logo"
+        class="h-12 w-auto drop-shadow-md transition-transform duration-300 hover:scale-105 cursor-pointer"
+      />
+    </div>
   </div>
 </nav>

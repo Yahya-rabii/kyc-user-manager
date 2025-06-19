@@ -165,4 +165,31 @@ export class AppLogicService {
     }
   }
 
+  async updateUserRoles (realm: string, userId: string, roles: any[]): Promise<void> {
+    const accessToken = sessionStorage.getItem('access_token');
+    if (!accessToken) {
+      throw new Error('No access token found in session storage');
+    }
+    const updateRolesUrl = `${environment.AuthapiUrl}/realms/${realm}/users/${userId}/roles`;
+    try {
+      const response = await fetch(updateRolesUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(roles),
+      });
+      if (!response.ok) {
+        console.error('Error updating roles:', response.statusText);
+        throw new Error('Failed to update roles');
+      }
+    } catch (error) {
+      console.error('Error updating roles:', error);
+      throw error;
+    }
+  }
+
+  
+
 }

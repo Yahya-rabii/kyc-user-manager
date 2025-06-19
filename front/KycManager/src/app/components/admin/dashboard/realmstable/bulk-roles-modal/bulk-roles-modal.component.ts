@@ -13,8 +13,10 @@ export interface UserWithRoles {
   id: string;
   username: string;
   email?: string;
-  assignedRoles: Role[];
+  roles: Role[];
   selected?: boolean;
+  showActionsMenu?: boolean;
+    roleSearchTerm?: string;
 }
 
 @Component({
@@ -31,14 +33,14 @@ export class BulkUserRolesModalComponent implements OnInit {
   @Output() rolesUpdated = new EventEmitter<void>();
 
   availableRoles: Role[] = [];
-  // Instead of selectedRoles globally, we keep track of selected roles on all users
   selectedTypeFilter = '';
   roleSearchTerm = '';
   userSearchTerm = '';
   currentPage = 1;
-  rolesPerPage = 5;
+  rolesPerPage = 10;
   userPage = 1;
-  usersPerPage = 5;
+  usersPerPage = 10;
+  step = 1;
 
   loadingRoles = false;
   processing = false;
@@ -57,11 +59,10 @@ export class BulkUserRolesModalComponent implements OnInit {
       const availableRaw = await this.appLogicService.getAvailableRoles(this.realm);
       this.availableRoles = this.normalizeAvailable(availableRaw);
 
-      // Load assigned roles per user
       for (const user of this.users) {
         const raw = await this.appLogicService.getUserRoles(this.realm, user.id);
         const roles = this.normalizeUser(raw);
-        user.assignedRoles = roles;
+        user.roles = roles;
       }
     } catch (e) {
       console.error(e);
@@ -72,10 +73,7 @@ export class BulkUserRolesModalComponent implements OnInit {
   }
 
   normalizeAvailable(raw: any): Role[] {
-    const realmRoles: Role[] = (raw.realmRoles || []).map((r: any) => ({
-      ...r,
-      type: 'realm'
-    }));
+    const realmRoles: Role[] = (raw.realmRoles || []).map((r: any) => ({ ...r, type: 'realm' }));
     const clientRoles: Role[] = Object.entries(raw.clientRoles || {}).flatMap(
       ([client, roles]: [string, any]) =>
         (roles as any[]).map(role => ({ ...role, type: `client:${client}` }))
@@ -84,10 +82,7 @@ export class BulkUserRolesModalComponent implements OnInit {
   }
 
   normalizeUser(raw: any): Role[] {
-    const realm: Role[] = (raw.realmMappings || []).map((r: any) => ({
-      ...r,
-      type: 'realm'
-    }));
+    const realm: Role[] = (raw.realmMappings || []).map((r: any) => ({ ...r, type: 'realm' }));
     const clients: Role[] = Object.entries(raw.clientMappings || {}).flatMap(
       ([client, data]: [string, any]) =>
         data.mappings.map((r: any) => ({ ...r, type: `client:${client}` }))
@@ -96,21 +91,13 @@ export class BulkUserRolesModalComponent implements OnInit {
   }
 
   getClientIds(): string[] {
-    return Array.from(
-      new Set(
-        this.availableRoles
-          .filter(r => r.type.startsWith('client:'))
-          .map(r => r.type.split(':')[1])
-      )
-    );
+    return Array.from(new Set(this.availableRoles.filter(r => r.type.startsWith('client:')).map(r => r.type.split(':')[1])));
   }
 
   filteredAvailableRoles(): Role[] {
     return this.availableRoles.filter(
-      role =>
-        (!this.selectedTypeFilter || role.type === this.selectedTypeFilter) &&
-        (!this.roleSearchTerm ||
-          role.name.toLowerCase().includes(this.roleSearchTerm.toLowerCase()))
+      role => (!this.selectedTypeFilter || role.type === this.selectedTypeFilter) &&
+              (!this.roleSearchTerm || role.name.toLowerCase().includes(this.roleSearchTerm.toLowerCase()))
     );
   }
 
@@ -124,10 +111,7 @@ export class BulkUserRolesModalComponent implements OnInit {
   }
 
   filteredUsers(): UserWithRoles[] {
-    return this.users.filter(u =>
-      !this.userSearchTerm ||
-      u.username.toLowerCase().includes(this.userSearchTerm.toLowerCase())
-    );
+    return this.users.filter(u => !this.userSearchTerm || u.username.toLowerCase().includes(this.userSearchTerm.toLowerCase()));
   }
 
   paginatedUsers(): UserWithRoles[] {
@@ -139,33 +123,18 @@ export class BulkUserRolesModalComponent implements OnInit {
     return Math.ceil(this.filteredUsers().length / this.usersPerPage);
   }
 
-  /** Checks if this role is selected by ALL users (bulk selection) */
   isBulkRoleSelected(role: Role): boolean {
-    // If every user has this role assigned, then role is selected bulk
-    return this.users.every(user =>
-      user.assignedRoles.some(r => r.name === role.name && r.type === role.type)
-    );
+    return this.users.every(user => user.roles.some(r => r.name === role.name && r.type === role.type));
   }
 
-  /** Toggle role for ALL users at once */
   async toggleBulkRole(role: Role) {
     this.processing = true;
     this.error = null;
     try {
       if (this.isBulkRoleSelected(role)) {
-        // Remove role from ALL users
-        await Promise.all(
-          this.users.map(user =>
-            this.removeRoleFromUser(user, role, true /*silent*/)
-          )
-        );
+        await Promise.all(this.users.map(user => this.removeRoleFromUser(user, role, true)));
       } else {
-        // Add role to ALL users
-        await Promise.all(
-          this.users.map(user =>
-            this.addRoleToUser(user, role, true /*silent*/)
-          )
-        );
+        await Promise.all(this.users.map(user => this.addRoleToUser(user, role, true)));
       }
     } catch (e) {
       console.error(e);
@@ -175,23 +144,13 @@ export class BulkUserRolesModalComponent implements OnInit {
     }
   }
 
-  /** Remove a role from a single user with optional silent flag to avoid multiple reloads */
   async removeRoleFromUser(user: UserWithRoles, role: Role, silent = false) {
-    if (!user.assignedRoles.find(r => r.name === role.name && r.type === role.type)) {
-      return; // role not assigned
-    }
-
+    if (!user.roles.find(r => r.name === role.name && r.type === role.type)) return;
     if (!silent) this.processing = true;
     this.error = null;
-
     try {
-      await this.appLogicService.removeRolesFromUser(this.realm, user.id, [
-        this.sanitizeRole(role)
-      ]);
-      // Update UI
-      user.assignedRoles = user.assignedRoles.filter(
-        r => !(r.name === role.name && r.type === role.type)
-      );
+      await this.appLogicService.removeRolesFromUser(this.realm, user.id, [this.sanitizeRole(role)]);
+      user.roles = user.roles.filter(r => !(r.name === role.name && r.type === role.type));
       if (!silent) this.rolesUpdated.emit();
     } catch (e) {
       console.error(e);
@@ -201,20 +160,13 @@ export class BulkUserRolesModalComponent implements OnInit {
     }
   }
 
-  /** Add a role to a single user */
   async addRoleToUser(user: UserWithRoles, role: Role, silent = false) {
-    if (user.assignedRoles.find(r => r.name === role.name && r.type === role.type)) {
-      return; // already assigned
-    }
-
+    if (user.roles.find(r => r.name === role.name && r.type === role.type)) return;
     if (!silent) this.processing = true;
     this.error = null;
-
     try {
-      await this.appLogicService.addRolesToUser(this.realm, user.id, [
-        this.sanitizeRole(role)
-      ]);
-      user.assignedRoles.push(role);
+      await this.appLogicService.addRolesToUser(this.realm, user.id, [this.sanitizeRole(role)]);
+      user.roles.push(role);
       if (!silent) this.rolesUpdated.emit();
     } catch (e) {
       console.error(e);
@@ -240,9 +192,57 @@ export class BulkUserRolesModalComponent implements OnInit {
     this.currentPage = 1;
   }
 
+  goToStep(stepNum: number) {
+    this.step = stepNum;
+  }
+
+  async submitRoles() {
+    this.processing = true;
+    try {
+      for (const user of this.users) {
+        await this.appLogicService.updateUserRoles(this.realm, user.id, user.roles.map(r => this.sanitizeRole(r)));
+      }
+      this.rolesUpdated.emit();
+      this.close.emit();
+    } catch (e) {
+      console.error(e);
+      this.error = 'Failed to submit changes.';
+    } finally {
+      this.processing = false;
+    }
+  }
+
   onClose() {
     this.close.emit();
   }
+// Step 1: Search + Pagination per user (displayed roles)
+roleSearchTermPerUser: string = '';
+assignedRolesPerUserPage: number = 5;
+assignedRolesPerUserCurrentPage: { [userId: string]: number } = {};
 
+getFilteredRolesForUser(user: UserWithRoles): Role[] {
+  return user.roles.filter(role =>
+    role.name.toLowerCase().includes(this.roleSearchTermPerUser.toLowerCase())
+  );
+}
+
+getPaginatedRolesForUser(user: UserWithRoles): Role[] {
+  const roles = this.getFilteredRolesForUser(user);
+  const currentPage = this.assignedRolesPerUserCurrentPage[user.id] || 1;
+  const start = (currentPage - 1) * this.assignedRolesPerUserPage;
+  return roles.slice(start, start + this.assignedRolesPerUserPage);
+}
+
+getTotalPagesForUser(user: UserWithRoles): number {
+  return Math.ceil(this.getFilteredRolesForUser(user).length / this.assignedRolesPerUserPage);
+}
+
+changeUserRolePage(userId: string, page: number) {
+  this.assignedRolesPerUserCurrentPage[userId] = page;
+}
+getFilteredRoles(user: UserWithRoles): Role[] {
+  const term = user.roleSearchTerm?.toLowerCase() || '';
+  return user.roles.filter(role => role.name.toLowerCase().includes(term));
+}
 
 }

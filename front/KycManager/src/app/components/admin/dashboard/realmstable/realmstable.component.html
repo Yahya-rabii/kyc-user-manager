@@ -114,6 +114,7 @@
         </th>
         <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">Username</th>
         <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">Email</th>
+        <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">Roles</th>
         <th class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-center">Action</th>
       </tr>
     </thead>
@@ -136,6 +137,27 @@
         <td class="px-4 py-3">
           {{ user.email || '-' }}
         </td>
+
+        <td class="px-4 py-3">
+          <ng-container *ngIf="(user.roles?.length ?? 0) > 0; else noRoles">
+            <span
+              *ngFor="let role of user.roles.slice(0, 3); let i = index"
+              class="inline-block bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 text-xs font-medium mr-1 px-2.5 py-0.5 rounded"
+            >
+              {{ role.name }}
+            </span>
+            <span
+              *ngIf="user.roles.length > 3"
+              class="inline-block text-gray-500 dark:text-gray-400 text-sm"
+              >+{{ user.roles.length - 3 }} more</span
+            >
+          </ng-container>
+          <ng-template #noRoles>
+            <span class="text-sm italic text-gray-400 dark:text-gray-500">No roles</span>
+          </ng-template>
+        </td>
+
+
         <td class="px-4 py-3 text-center">
           <button
             type="button"
@@ -149,6 +171,18 @@
               <circle cx="14" cy="10" r="2" />
             </svg>
           </button>
+          <button
+            type="button"
+            aria-label="View user info"
+            class="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-green-100 dark:hover:bg-green-800 transition ml-2"
+            (click)="openUserInfoCard(user)"
+          >
+            <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-4m0-4h.01" />
+            </svg>
+          </button>
+
         </td>
       </tr>
     </tbody>
@@ -219,3 +253,11 @@
   (close)="closeBulkRolesModal()"
   (rolesUpdated)="onRolesUpdated()"
 ></app-bulk-user-roles-modal>
+
+<!-- User info card -->
+<app-user-info-card
+  *ngIf="displayUser"
+  [user]="displayUser"
+  [realm]="selectedRealm!"
+  (close)="onUserInfoCardClose()"
+></app-user-info-card>

@@ -9,12 +9,13 @@ import { User } from '../../../../models/user.model';
 import { MatIconModule } from '@angular/material/icon';
 import { Role } from '../../../../models/role.model';
 import { UserWithRoles } from './bulk-roles-modal/bulk-roles-modal.component';
+import { UserInfoCardComponent } from "./user-info-card/user-info-card.component";
 
 
 @Component({
   selector: 'app-realmstable',
   standalone: true,
-  imports: [CommonModule, FormsModule , UserRolesModalComponent , BulkUserRolesModalComponent , MatIconModule],
+  imports: [CommonModule, FormsModule, UserRolesModalComponent, BulkUserRolesModalComponent, MatIconModule, UserInfoCardComponent],
   templateUrl: './realmstable.component.html',
   styleUrls: ['./realmstable.component.css'],
 })
@@ -39,6 +40,7 @@ export class RealmstableComponent implements OnInit {
   usersError: string | null = null;
  // For role editing modal
   editingUser: UserWithRoles| null = null;
+  displayUser : UserWithRoles | null = null;
 
   // Open bulk roles modal
   openBulkRolesModal() {
@@ -75,6 +77,11 @@ export class RealmstableComponent implements OnInit {
     this.editingUser = user;
   }
 
+
+  openUserInfoCard(user: UserWithRoles) {
+    this.displayUser = user;
+  }
+
   closeRolesModal() {
     this.editingUser = null;
   }
@@ -86,6 +93,15 @@ export class RealmstableComponent implements OnInit {
       this.loadUsers(this.selectedRealm);
     }
   }
+
+  onUserInfoCardOpen(user: UserWithRoles) {
+    this.displayUser = user;
+  }
+
+  onUserInfoCardClose() {
+    this.displayUser = null;
+  }
+
   constructor(private appLogicService: AppLogicService) {}
 
   ngOnInit(): void {
@@ -140,20 +156,42 @@ export class RealmstableComponent implements OnInit {
 
   // Users methods
   loadUsers(realm: string) {
-    this.loadingUsers = true;
-    this.usersError = null;
-    from(this.appLogicService.getUsersInRealm(realm)).subscribe({
-      next: (data) => {
-        this.users = data || [];
+  this.loadingUsers = true;
+  this.usersError = null;
+
+  from(this.appLogicService.getUsersInRealm(realm)).subscribe({
+    next: (usersData) => {
+      const users = usersData || [];
+
+      Promise.all(
+        users.map(async (user: any) => {
+          const userRolesRaw = await this.appLogicService.getUserRoles(realm, user.id) as any;
+          const realmRoles = (userRolesRaw && !Array.isArray(userRolesRaw) && userRolesRaw.realmMappings ? userRolesRaw.realmMappings : []).map((r: any) => ({ ...r, type: 'realm' }));
+          const hasClientMappings = userRolesRaw && typeof userRolesRaw === 'object' && !Array.isArray(userRolesRaw) && 'clientMappings' in userRolesRaw && userRolesRaw.clientMappings;
+          const clientRoles = hasClientMappings
+            ? Object.entries(userRolesRaw.clientMappings).flatMap(
+                ([client, data]: [string, any]) =>
+                  data.mappings.map((r: any) => ({ ...r, type: `client:${client}` }))
+              )
+            : [];
+          return {
+            ...user,
+            roles: [...realmRoles, ...clientRoles]
+          };
+        })
+      ).then((usersWithRoles) => {
+        this.users = usersWithRoles;
         this.applyUserFilter();
         this.loadingUsers = false;
-      },
-      error: (err) => {
-        this.usersError = 'Failed to load users.';
-        this.loadingUsers = false;
-      },
-    });
-  }
+      });
+    },
+    error: (err) => {
+      this.usersError = 'Failed to load users.';
+      this.loadingUsers = false;
+    }
+  });
+}
+
 
   applyUserFilter() {
     const term = this.userSearchTerm.trim().toLowerCase();
@@ -184,5 +222,6 @@ export class RealmstableComponent implements OnInit {
   allUsersSelected(): boolean {
     return this.filteredUsers.length > 0 && this.filteredUsers.every(u => u.selected);
   }
+
 
 }

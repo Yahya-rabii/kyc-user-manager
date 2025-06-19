@@ -184,4 +184,28 @@ async submitSelectedRoles() {
   onClose() {
     this.close.emit();
   }
+
+  assignedRolesSearchTerm: string = '';
+assignedCurrentPage: number = 1;
+assignedRolesPerPage: number = 5;
+
+get filteredAssignedRoles(): any[] {
+  return this.selectedRoles.filter(role =>
+    role.name.toLowerCase().includes(this.assignedRolesSearchTerm.toLowerCase())
+  );
+}
+
+get paginatedAssignedRoles(): any[] {
+  const start = (this.assignedCurrentPage - 1) * this.assignedRolesPerPage;
+  return this.filteredAssignedRoles.slice(start, start + this.assignedRolesPerPage);
+}
+
+get assignedTotalPages(): number {
+  return Math.ceil(this.filteredAssignedRoles.length / this.assignedRolesPerPage);
+}
+
+goToAssignedPage(page: number) {
+  this.assignedCurrentPage = page;
+}
+
 }
