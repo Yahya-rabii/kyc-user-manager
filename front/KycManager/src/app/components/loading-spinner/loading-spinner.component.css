@@ -5,7 +5,7 @@
   width: 100vw;
   height: 100vh;
   /* replicate your bg-gradient-to-b from-blue-900 via-gray-900 to-blue-500 */
-  background: linear-gradient(to bottom, #1e40af, #111827, #3b82f6);
+  background: linear-gradient(to bottom, #036b4f, #024533, #3c524f);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,7 +25,7 @@
 }
 
 .spinner-text {
-  color: #bfdbfe; /* Tailwind blue-200 */
+  color: #ffffff; /* Tailwind blue-200 */
   font-size: 1.25rem;
   font-weight: 500;
   letter-spacing: 0.5px;

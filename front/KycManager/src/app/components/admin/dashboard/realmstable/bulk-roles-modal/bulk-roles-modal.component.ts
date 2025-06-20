@@ -6,7 +6,7 @@ import { AppLogicService } from '../../../../../services/app.logic.service';
 interface Role {
   id: string;
   name: string;
-  type: string; // e.g., 'realm' or 'client:clientId'
+  type: string;
 }
 
 export interface UserWithRoles {
@@ -16,7 +16,8 @@ export interface UserWithRoles {
   roles: Role[];
   selected?: boolean;
   showActionsMenu?: boolean;
-    roleSearchTerm?: string;
+  roleSearchTerm?: string;
+  showSearch?: boolean; // For sliding search input
 }
 
 @Component({
@@ -63,6 +64,8 @@ export class BulkUserRolesModalComponent implements OnInit {
         const raw = await this.appLogicService.getUserRoles(this.realm, user.id);
         const roles = this.normalizeUser(raw);
         user.roles = roles;
+        user.showSearch = false;
+        user.roleSearchTerm = '';
       }
     } catch (e) {
       console.error(e);
@@ -215,34 +218,9 @@ export class BulkUserRolesModalComponent implements OnInit {
   onClose() {
     this.close.emit();
   }
-// Step 1: Search + Pagination per user (displayed roles)
-roleSearchTermPerUser: string = '';
-assignedRolesPerUserPage: number = 5;
-assignedRolesPerUserCurrentPage: { [userId: string]: number } = {};
 
-getFilteredRolesForUser(user: UserWithRoles): Role[] {
-  return user.roles.filter(role =>
-    role.name.toLowerCase().includes(this.roleSearchTermPerUser.toLowerCase())
-  );
-}
-
-getPaginatedRolesForUser(user: UserWithRoles): Role[] {
-  const roles = this.getFilteredRolesForUser(user);
-  const currentPage = this.assignedRolesPerUserCurrentPage[user.id] || 1;
-  const start = (currentPage - 1) * this.assignedRolesPerUserPage;
-  return roles.slice(start, start + this.assignedRolesPerUserPage);
-}
-
-getTotalPagesForUser(user: UserWithRoles): number {
-  return Math.ceil(this.getFilteredRolesForUser(user).length / this.assignedRolesPerUserPage);
-}
-
-changeUserRolePage(userId: string, page: number) {
-  this.assignedRolesPerUserCurrentPage[userId] = page;
-}
-getFilteredRoles(user: UserWithRoles): Role[] {
-  const term = user.roleSearchTerm?.toLowerCase() || '';
-  return user.roles.filter(role => role.name.toLowerCase().includes(term));
-}
-
+  getFilteredRoles(user: UserWithRoles): Role[] {
+    const term = user.roleSearchTerm?.toLowerCase() || '';
+    return user.roles.filter(role => role.name.toLowerCase().includes(term));
+  }
 }

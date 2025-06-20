@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="modal-header flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
       <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-        <span class="material-icons text-blue-600 dark:text-blue-400">security</span>
+        <span class="material-icons text-green-600 dark:text-green-400">security</span>
         Edit Roles for <span class="font-bold">{{ user.username }}</span> in realm <span class="font-bold">{{ realm }}</span>
       </h2>
       <button class="close-btn text-2xl text-gray-500 hover:text-red-600 transition" (click)="onClose()" aria-label="Close">
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Loading/Error -->
-    <div *ngIf="loadingRoles" class="p-6 text-center text-blue-600 dark:text-blue-400">
+    <div *ngIf="loadingRoles" class="p-6 text-center text-green-600 dark:text-green-400">
       <span class="material-icons animate-spin align-middle mr-2">autorenew</span> Loading roles...
     </div>
     <div *ngIf="error" class="error p-6 text-center text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 rounded">
@@ -49,12 +49,12 @@
         <div
           *ngFor="let role of paginatedRoles()"
           (click)="toggleSelectRole(role)"
-          [class.bg-blue-100]="isRoleSelected(role)"
-          [class.dark\:bg-blue-900]="isRoleSelected(role)"
-          class="cursor-pointer border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-sm hover:bg-blue-50 dark:hover:bg-blue-900 transition relative group"
+          [class.bg-green-100]="isRoleSelected(role)"
+          [class.dark\:bg-green-900]="isRoleSelected(role)"
+          class="cursor-pointer border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-sm hover:bg-green-50 dark:hover:bg-green-900 transition relative group"
         >
           <div class="flex items-center gap-2">
-            <span class="material-icons text-blue-600 dark:text-blue-400 text-lg">vpn_key</span>
+            <span class="material-icons text-green-600 dark:text-green-400 text-lg">vpn_key</span>
             <span class="font-medium text-gray-800 dark:text-gray-100">{{ role.name }}</span>
           </div>
           <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">({{ role.type }})</div>
@@ -139,7 +139,7 @@
       <button
         (click)="submitSelectedRoles()"
         [disabled]="processing"
-        class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-8 py-2 rounded shadow font-semibold transition"
+        class="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white px-8 py-2 rounded shadow font-semibold transition"
       >
         <span *ngIf="processing" class="material-icons animate-spin align-middle mr-2">autorenew</span>
         Submit Changes

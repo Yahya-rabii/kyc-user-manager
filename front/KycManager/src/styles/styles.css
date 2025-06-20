@@ -11,5 +11,5 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 .spinner .mat-progress-spinner circle {
-  stroke: #3b82f6 !important; /* Tailwind blue-500 */
+  stroke: #7a7a7a !important; /* Tailwind blue-500 */
 }
