@@ -1,8 +1,0 @@
-@Library('backend_shared_library') _
-
-generic_backend_pipeline(
-    gitRepo: 'git@github.com:Yahya-rabii/SGMA-System.git',
-    folderPath: 'AppCC-back/Authentication',
-    gitCredentialsId: 'sgma-system-creds',
-    serviceName: 'authentication-service'
-)
